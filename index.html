@@ -1,0 +1,2681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词听写学习软件 - 旗舰增强版</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff7e5f;
+            --light-color: #f5f7fa;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --warning-color: #f39c12;
+            --border-color: #e2e8f0;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+        body { background:#f0f2f5; color:var(--dark-color); line-height:1.6; padding:20px; }
+        .container { max-width:1250px; margin:0 auto; }
+        header { text-align:center; margin-bottom:20px; padding:20px; background:linear-gradient(135deg,var(--primary-color),var(--secondary-color)); color:white; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size:2.5rem; margin-bottom:10px; }
+        .subtitle { font-size:1.2rem; opacity:0.9; }
+        
+        .dashboard-panel { background:white; border-radius:10px; padding:15px 20px; box-shadow:0 4px 6px rgba(0,0,0,0.05); margin-bottom:20px; border-left: 5px solid var(--accent-color); }
+        .dashboard-header { display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+        .dashboard-header h3 { margin:0; color:var(--dark-color); font-size:1.1rem; }
+        .stat-box { flex:1; text-align:center; padding:15px; background:#f8fafc; border-radius:8px; }
+        .stat-box.border-left { border-left:1px solid #e2e8f0; border-radius:0 8px 8px 0; }
+        .schedule-item { font-size:0.9rem; margin-bottom:6px; padding:8px 12px; background:#f1f5f9; border-radius:6px; border-left:3px solid var(--primary-color); display:flex; justify-content:space-between; }
+        
+        .main-content { display:grid; grid-template-columns:1fr 2fr; gap:20px; }
+        @media (max-width:768px) { .main-content { grid-template-columns:1fr; } }
+        .panel { background:white; border-radius:10px; padding:20px; box-shadow:0 4px 6px rgba(0,0,0,0.05); margin-bottom:20px; position:relative; }
+        h2 { color:var(--primary-color); margin-bottom:15px; padding-bottom:10px; border-bottom:2px solid var(--light-color); }
+        
+        .form-group { margin-bottom:15px; }
+        label { display:block; margin-bottom:5px; font-weight:600; font-size:0.95rem; }
+        input,select,textarea { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:1rem; transition:border-color 0.3s; }
+        input:focus, select:focus { border-color:var(--primary-color); outline:none; }
+        input:disabled { background: #f1f5f9; cursor: not-allowed; color: #94a3b8; }
+        
+        button { background:var(--primary-color); color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-size:1rem; transition:all 0.3s; }
+        button:hover { background:var(--secondary-color); transform:translateY(-1px); }
+        button.secondary { background:#95a5a6; } button.secondary:hover { background:#7f8c8d; }
+        button.success { background:var(--success-color); } button.success:hover { background:#27ae60; }
+        button.error { background:var(--error-color); } button.error:hover { background:#c0392b; }
+        button.warning { background:var(--warning-color); } button.warning:hover { background:#e67e22; }
+        
+        .btn-tiny { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s ease; }
+        .btn-audio { padding: 2px 6px; border-radius: 50%; font-size: 0.8rem; background: #e2e8f0; color: #475569; margin-left: 6px; vertical-align: middle;}
+        .btn-audio:hover { background: var(--primary-color); color: white; }
+
+        /* 柔和质感按钮配色 */
+        .btn-soft-blue { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+        .btn-soft-blue:hover { background: #bae6fd; transform: translateY(-1px); }
+        .btn-soft-orange { background: #ffedd5; color: #ea580c; border: 1px solid #fed7aa; }
+        .btn-soft-orange:hover { background: #fed7aa; transform: translateY(-1px); }
+        .btn-soft-purple { background: #f3e8ff; color: #9333ea; border: 1px solid #e9d5ff; }
+        .btn-soft-purple:hover { background: #e9d5ff; transform: translateY(-1px); }
+        .btn-soft-red { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .btn-soft-red:hover { background: #fecaca; transform: translateY(-1px); }
+        .btn-soft-green { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+        .btn-soft-green:hover { background: #bbf7d0; transform: translateY(-1px); }
+        
+        .search-area { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border-color); position:relative; }
+        .search-input { width: 100%; padding: 8px 15px; border-radius: 20px; border: 1px solid #cbd5e1; font-size: 0.95rem; margin-bottom: 8px; }
+        .search-input:last-child { margin-bottom: 0; }
+        
+        .group-select { width: 100%; max-width: 280px; padding: 8px 30px 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #fff; color: var(--primary-color); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); appearance: none; }
+        
+        /* 自定义搜索下拉框样式 */
+        .searchable-select-wrapper { position: relative; width: 100%; max-width: 320px; display: inline-block; text-align: left; vertical-align: middle; margin-bottom: 5px; }
+        .ss-display { padding: 8px 30px 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; color: var(--primary-color); font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .ss-display:hover { border-color: var(--primary-color); }
+        .ss-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; border-radius: 6px; margin-top: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 9999; display: none; flex-direction: column; max-height: 300px; }
+        .ss-search { padding: 8px; border-bottom: 1px solid #f1f5f9; position: sticky; top: 0; background: white; border-radius: 6px 6px 0 0; }
+        .ss-search input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.9rem; outline: none; }
+        .ss-search input:focus { border-color: var(--primary-color); }
+        .ss-options { overflow-y: auto; flex: 1; }
+        .ss-option { padding: 8px 12px; font-size: 0.9rem; cursor: pointer; border-bottom: 1px solid #f8fafc; color: var(--dark-color); }
+        .ss-option:hover { background: #f1f5f9; }
+        .ss-option.selected { background: #e0e7ff; color: var(--primary-color); font-weight: bold; }
+        .ss-optgroup-label { padding: 6px 12px; font-size: 0.8rem; font-weight: bold; color: #94a3b8; background: #fafafa; border-bottom: 1px solid #f1f5f9; }
+
+        .search-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #cbd5e1; border-radius:8px; max-height:250px; overflow-y:auto; z-index:100; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); display:none; }
+        .search-drop-item { padding:10px 15px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-size:0.9rem; }
+        .search-drop-item:hover { background:#f8fafc; }
+        .search-drop-item:last-child { border-bottom:none; }
+        
+        .resizable-list { height: 600px; min-height: 200px; overflow-y: auto; resize: vertical; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: #fafcff; }
+        #word-progress-list { height: 750px; scroll-behavior: smooth; }
+
+        .word-item { display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee; transition:background 0.2s; }
+        .word-item:hover { background: #f1f5f9; }
+        .word-info { flex:1; min-width:280px; }
+        .group-tag { font-size: 0.75rem; background: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
+        
+        .btn-group { display:flex; gap:10px; margin-top:15px; flex-wrap:wrap; justify-content:center; }
+        .dictation-area { text-align:center; padding:30px; }
+        .mode-selector { display:flex; justify-content:center; margin-bottom:20px; }
+        .mode-btn { padding:10px 20px; background:#ecf0f1; color:var(--dark-color); border:none; cursor:pointer; }
+        .mode-btn.active { background:var(--primary-color); color:white; }
+        .dictation-display { font-size:2rem; margin:20px 0; min-height:60px; display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--primary-color); }
+        .input-group { margin:20px 0; text-align:left; }
+        .feedback { margin:20px 0; padding:15px; border-radius:8px; display:none; text-align:left; line-height:1.8; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+        .feedback.correct { background:#f0fdf4; display:block; border-left:5px solid var(--success-color); }
+        .feedback.warning-pass { background:#fdfde6; display:block; border-left:5px solid var(--warning-color); }
+        .feedback.incorrect { background:#fef2f2; display:block; border-left:5px solid var(--error-color); }
+        .progress-bar { height:12px; background:#ecf0f1; border-radius:6px; margin:20px 0; overflow:hidden; }
+        .progress { height:100%; background:var(--success-color); width:0%; transition:width 0.3s; }
+        
+        /* 扩展的 stats 展示 */
+        .stats { display:flex; justify-content:space-around; margin-top:20px; background:#f8fafc; padding:15px; border-radius:8px; flex-wrap:wrap; gap:10px;}
+        .stat-item { text-align:center; min-width: 50px; }
+        .stat-value { font-size:1.5rem; font-weight:bold; color:var(--primary-color); }
+        
+        .tab-container { margin-top:20px; }
+        .tabs { display:flex; border-bottom:1px solid #ddd; }
+        .tab { padding:10px 20px; cursor:pointer; border-bottom:3px solid transparent; }
+        .tab.active { border-bottom-color:var(--primary-color); font-weight:bold; }
+        .tab-content { display:none; padding:20px 0; }
+        .tab-content.active { display:block; }
+        
+        .hidden { display:none !important; }
+        .group-review { margin-bottom:15px; border:1px solid #e2e8f0; border-radius:8px; background:white; }
+        .group-header { cursor:pointer; background:#f8fafc; padding:12px 15px; display:flex; justify-content:space-between; align-items:center; font-weight:bold; transition:background 0.2s; position: sticky; top: -10px; z-index: 10; border-bottom: 1px solid var(--border-color); border-top-left-radius: 7px; border-top-right-radius: 7px; }
+        .group-header:hover { background:#f1f5f9; }
+        .group-content { display:none; padding:12px; background:white; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+        .group-content.active { display:block; }
+        .review-history { list-style:none; }
+        .review-history li { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid #eee; }
+        .review-history li:last-child { margin-bottom:0; border-bottom:none; padding-bottom:0; }
+
+        .word-progress-item { padding:15px 12px; border-bottom:1px solid #f1f5f9; transition: background-color 0.8s ease; }
+        .word-progress-item:last-child { border-bottom:none; }
+        .state-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin: 10px 0; display: flex; gap: 15px; }
+        .state-col { flex: 1; font-size: 0.9rem; line-height: 1.6; display:flex; flex-direction:column; }
+        .state-col-left { border-right: 1px solid #e2e8f0; padding-right: 15px; }
+        .state-title { color: #475569; font-weight: bold; margin-bottom: 8px; font-size: 0.85rem; padding-bottom:4px; border-bottom:1px dashed #cbd5e1; display:inline-block; }
+        .state-content { flex: 1; margin-bottom: 10px; }
+        .state-actions { margin-top: auto; display: flex; gap: 6px; flex-wrap: wrap; border-top:1px solid #f1f5f9; padding-top:8px;}
+        
+        .err-badge { background: #fee2e2; color: #ef4444; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        
+        .spell-highlight { margin-top:8px; padding:8px 10px; background:#fff1f0; border-radius:6px; font-size:0.95rem; color:#475569; border-left:4px solid #ef4444; display:block; letter-spacing: 0.5px;}
+        .missed-highlight { margin-top:8px; padding:8px 10px; background:#fffbeb; border-radius:6px; font-size:0.9rem; color:#b45309; border-left:4px solid #f59e0b; display:block;}
+        
+        .char-correct { color: #10b981; font-weight: 600; }
+        .char-wrong { background-color: #fecaca; color: #dc2626; font-weight: bold; border-radius: 2px; padding: 0 2px; }
+
+        .note-box { margin-top: 10px; background: #fffde7; padding: 10px 12px; border-radius: 6px; border-left: 4px solid #fbc02d; font-size: 0.9rem; }
+        .note-header { display: flex; justify-content: space-between; color: #f57f17; font-weight: bold; margin-bottom: 6px; }
+
+        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:1000; }
+        .modal.show { display:flex; }
+        .modal-content { background:white; padding:25px; border-radius:10px; width:320px; box-shadow:0 10px 30px rgba(0,0,0,0.2); text-align:center; }
+        
+        #summary-panel { display:none; text-align:left; animation: fadeIn 0.3s; }
+        #summary-list { max-height: 400px; overflow-y: auto; margin: 15px 0; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background:#fafcff; }
+        .summary-item { border-bottom: 1px dashed #e2e8f0; padding: 12px 0; }
+        .summary-item:last-child { border-bottom: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>单词听写学习软件</h1>
+            <p class="subtitle">智能锁定提交 · 词性兼容匹配 · 沉浸式错题括号清洗 · 全新选择视图</p>
+            <button id="admin-btn" style="margin-top:15px;padding:6px 16px;background:var(--warning-color);color:white;border:none;border-radius:20px;cursor:pointer;font-size:0.9rem;">👨‍💻 管理员登录</button>
+        </header>
+
+        <div class="dashboard-panel" id="global-dashboard">
+            <div class="dashboard-header" id="dashboard-header">
+                <h3>📊 学习与复习进度总览</h3>
+                <span class="toggle-icon" id="dashboard-toggle-icon">▼</span>
+            </div>
+            <div id="dashboard-content" style="display:none; margin-top:15px; border-top:1px solid #e2e8f0; padding-top:15px;">
+                <div style="display:flex; margin-bottom:15px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                    <div class="stat-box">
+                        <div style="font-size:0.9rem; color:#64748b; font-weight:bold;">已掌握单词数 (无错记录)</div>
+                        <div id="total-memorized" style="font-size:1.8rem; color:var(--success-color); font-weight:bold; margin-top:5px;">0</div>
+                    </div>
+                    <div class="stat-box border-left">
+                        <div style="font-size:0.9rem; color:#64748b; font-weight:bold;">总学习单词数 (题库总计)</div>
+                        <div id="total-reviewed" style="font-size:1.8rem; color:var(--primary-color); font-weight:bold; margin-top:5px;">0</div>
+                    </div>
+                </div>
+                <div style="font-size:0.95rem; font-weight:bold; color:var(--dark-color); margin-bottom:8px;">各分组艾宾浩斯复习提醒：</div>
+                <div id="group-schedule-summary" style="max-height:220px; overflow-y:auto; padding-right:5px;"></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="panel">
+                    <h2>添加新单词</h2>
+                    <div class="form-group"><label>单词</label><input type="text" id="word-input" placeholder="输入单词"></div>
+                    <div class="form-group"><label>词义（多个用逗号/分号分隔，如: v.喜爱,趋向）</label><input type="text" id="meaning-input" placeholder="输入词义"></div>
+                    <div class="form-group"><label>选择分组</label><select id="group-select" class="group-select"><option value="default">默认分组</option></select></div>
+                    <div class="form-group"><input type="text" id="new-group-input" placeholder="或输入新分组名称"></div>
+                    <button id="add-word-btn" class="success" style="width:100%;">添加单词</button>
+                </div>
+
+                <div class="panel">
+                    <h2>导入Excel单词</h2>
+                    <div class="form-group"><input type="file" id="excel-file" accept=".xlsx,.xls"></div>
+                    <div class="form-group"><input type="text" id="import-range" placeholder="序号区间，如1-10"></div>
+                    <div class="form-group"><select id="import-group" class="group-select"><option value="default">默认分组</option></select></div>
+                    <div class="form-group"><input type="text" id="import-new-group-input" placeholder="或输入新分组名称"></div>
+                    <button id="import-excel-btn" class="success" style="width:100%;">导入Excel</button>
+                </div>
+
+                <div class="panel">
+                    <h2>数据管理</h2>
+                    <button id="export-data-btn" class="secondary" style="margin-bottom: 15px; width:100%;">导出数据到文件</button>
+                    <div class="form-group"><input type="file" id="import-data-file" accept=".json"></div>
+                    <button id="import-data-btn" class="secondary" style="width:100%;">导入数据</button>
+                </div>
+
+                <div class="panel" id="word-list-panel">
+                    <h2>单词列表</h2>
+                    <div class="search-area">
+                        <input type="text" id="global-search-input" class="search-input" placeholder="🌐 全局搜索：输入单词、词义或分组...">
+                        <div id="local-search-wrapper" style="display:none;">
+                            <input type="text" id="local-search-input" class="search-input" placeholder="🔍 组内搜索：在下方选中分组内查找...">
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
+                        <select id="word-list-group-select" class="group-select"></select>
+                        
+                        <button id="rename-group-btn" class="warning" style="padding:5px 12px; display:none; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:6px; border:none;" title="重命名当前选中分组">
+                            <span style="font-size:1.1rem; line-height:1;">✏️</span>
+                            <span style="font-size:0.75rem; font-weight:600; line-height:1; white-space:nowrap;">重命名</span>
+                        </button>
+                        
+                        <button id="delete-group-btn" class="error" style="padding:5px 12px; display:none; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:6px; border:none;" title="彻底删除当前分组">
+                            <span style="font-size:1.1rem; line-height:1;">🗑️</span>
+                            <span style="font-size:0.75rem; font-weight:600; line-height:1; white-space:nowrap;">删除</span>
+                        </button>
+                    </div>
+
+                    <div class="resizable-list" id="word-list"></div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="panel" style="border-top: 4px solid var(--primary-color);">
+                    <h2>听写训练</h2>
+                    <div class="mode-selector" id="mode-selector-div">
+                        <button class="mode-btn active" data-mode="spelling">听音拼写+词义</button>
+                        <button class="mode-btn" data-mode="spelling-only">仅听音拼写</button>
+                    </div>
+                    
+                    <div style="margin-bottom:20px; text-align:center;">
+                        <select id="dictation-group-select" class="group-select" style="max-width: 320px;"></select>
+                    </div>
+
+                    <div class="dictation-area">
+                        <div id="active-dictation-panel">
+                            <div class="progress-bar"><div class="progress" id="progress-bar"></div></div>
+                            <div class="dictation-display" id="current-word-display">请选择分组开始听写</div>
+                            
+                            <div class="input-group" id="spelling-input-group" style="display:none;">
+                                <label for="spelling-input">拼写单词</label>
+                                <input type="text" id="spelling-input" placeholder="根据发音拼写单词" autocomplete="off">
+                            </div>
+                            <div class="input-group" id="meaning-input-group" style="display:none;">
+                                <label for="dictation-meaning-input">输入词义 (词义兼容匹配，无视括号标点)</label>
+                                <input type="text" id="dictation-meaning-input" placeholder="输入单词的核心意思" autocomplete="off">
+                            </div>
+                            
+                            <div class="feedback" id="feedback"></div>
+  
+                            <div class="btn-group">
+                                <button id="start-dictation-btn">开始听写</button>
+                                <button id="start-review-btn" class="warning">开始复习听写</button>
+                                <button id="submit-answer-btn" style="display:none;" class="success">提交 (Enter)</button>
+                                <button id="forgot-meaning-btn" style="display:none;" class="warning">遗忘词义</button>
+                                <button id="cant-hear-btn" style="display:none;" class="secondary">没听懂发音</button>
+                                <button id="skip-word-btn" style="display:none;" class="secondary">跳过</button>
+
+                                <button id="confirm-next-btn" style="display:none;" class="primary">确认/下一个</button>
+                                <button id="quick-note-btn" style="display:none;" class="warning">📝 随记便签</button>
+                                <button id="repeat-word-btn" style="display:none;">重复播放</button>
+                                <button id="audio-speed-btn" style="display:none;" class="secondary" title="点击切换发音播放倍速">倍速: 1.0x</button>
+                               
+                                <button id="end-review-btn" style="display:none;" class="error">结束并重置</button>
+                                <button id="change-to-correct-btn" style="display:none;" class="success btn-tiny">强制改对</button>
+                                <button id="change-to-incorrect-btn" style="display:none;" class="error btn-tiny">强制改错</button>
+                                <button id="manual-edit-missed-btn" style="display:none;" class="warning btn-tiny">手动编辑遗漏</button>
+                                <button id="mark-no-missing-btn" style="display:none;" class="success btn-tiny">无遗漏</button>
+                            </div>
+                    
+                            <div class="stats">
+                                <div class="stat-item"><div class="stat-value" id="correct-count">0</div><div style="color:#64748b;">正确</div></div>
+                                <div class="stat-item"><div class="stat-value" id="incorrect-count">0</div><div style="color:#64748b;">错误</div></div>
+                                <div class="stat-item"><div class="stat-value" id="progress-text">0/0</div><div style="color:#64748b;">进度</div></div>
+                                <div class="stat-item"><div class="stat-value" id="pending-dictation-count">0</div><div style="color:#64748b;">待听写</div></div>
+                                <div class="stat-item"><div class="stat-value" id="pending-retest-count">0</div><div style="color:#64748b;">待重听</div></div>
+                            </div>
+                        </div>
+
+                        <div id="summary-panel">
+                            <h3 id="summary-title" style="color:var(--error-color); text-align:center;">📋 本轮错词总结</h3>
+                            <div id="summary-list"></div>
+                            <div class="btn-group" style="margin-top:20px;">
+                                <button id="summary-retest-btn" class="warning">马上强化复习错词</button>
+                                <button id="return-dictation-btn" class="primary">返回听写大厅</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+               <div class="panel">
+                    <h2>📈 数据分析与错题本</h2>
+                    <div class="tab-container">
+                        <div class="tabs">
+                            <div class="tab active" data-tab="review-schedule">遗忘曲线复习计划</div>
+                            <div class="tab" data-tab="word-progress">单词错题本与状态追踪</div>
+                        </div>
+                
+                        <div class="tab-content active" id="review-schedule">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                                <p style="color:#64748b; font-size:0.9rem; margin:0;">根据艾宾浩斯记忆法自动推算：</p>
+                                <select id="review-group-select" class="group-select"></select>
+                            </div>
+                            <div class="resizable-list" id="review-schedule-list" style="background:#fff;"></div>
+                        </div>
+             
+                        <div class="tab-content" id="word-progress">
+                            <div style="display:flex; gap:10px; align-items:center; position:relative; z-index:20; margin-bottom:10px;">
+                                <input type="text" id="err-book-search" class="search-input" style="flex:1; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,0.05); margin-bottom:0;" placeholder="🔍 快速定位错题：输入英文或词义...">
+                                <select id="progress-group-select" class="group-select"></select>
+                                <div id="err-book-dropdown" class="search-dropdown" style="top:100%; margin-top:5px;"></div>
+                            </div>
+                            <div id="word-progress-list" class="resizable-list" style="background:#fff; height: 690px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="modal show">
+        <div class="modal-content" style="width:360px;">
+            <h3 id="auth-modal-title" style="color:var(--primary-color); margin-bottom:20px;">登录账号</h3>
+            <div id="auth-error" style="color:var(--error-color); font-size:0.85rem; margin-bottom:10px; display:none;"></div>
+            <div class="form-group"><input type="text" id="auth-username" placeholder="邮箱地址" autocomplete="email"></div>
+            <div class="form-group"><input type="password" id="auth-password" placeholder="密码" autocomplete="current-password"></div>
+            <div class="btn-group">
+                <button id="auth-submit-btn" class="success">登录</button>
+                <button id="auth-switch-btn" class="secondary" style="font-size:0.85rem;">没有账号？去注册</button>
+            </div>
+            <p id="auth-status-text" style="font-size:0.8rem; color:#94a3b8; margin-top:10px;"></p>
+        </div>
+    </div>
+
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-content">
+            <h3>管理员安全校验</h3>
+            <div class="form-group"><input type="text" id="admin-username" value="Genius" readonly style="background:#f1f5f9;"></div>
+            <div class="form-group"><input type="password" id="admin-password" placeholder="输入授权密码" autocomplete="new-password"></div>
+            <div class="btn-group">
+                <button id="login-btn" class="success">授权登录</button>
+                <button id="cancel-login-btn" class="secondary">取消</button>
+            </div>
+            <p style="font-size:0.8rem; color:#94a3b8; margin-top:15px;">高级功能权限验证区</p>
+        </div>
+    </div>
+
+    <div id="edit-word-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:var(--primary-color); margin-bottom:20px;">修改单词数据</h3>
+            <input type="hidden" id="edit-word-id">
+            <div class="form-group">
+                <label>英文拼写</label>
+                <input type="text" id="edit-word-en" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>标准词义 (用逗号/分号分隔，支持词性如 v.)</label>
+                <textarea id="edit-word-zh" rows="3" style="resize:vertical;"></textarea>
+            </div>
+            <div class="btn-group" style="margin-top:20px;">
+                <button id="save-edit-word-btn" class="success">保存修改</button>
+                <button id="cancel-edit-word-btn" class="secondary">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function getUserId() {
+            const { data: { user } } = await supabase.auth.getUser();
+            return user ? user.id : null;
+        }
+
+        async function apiGetData(key) {
+            const userId = await getUserId();
+            if (!userId) throw new Error('未登录');
+            const { data, error } = await supabase
+                .from('user_data')
+                .select('value')
+                .eq('user_id', userId)
+                .eq('key', key)
+                .maybeSingle();
+            if (error) throw new Error(error.message);
+            return data ? data.value : null;
+        }
+
+        async function apiSetData(key, value) {
+            const userId = await getUserId();
+            if (!userId) throw new Error('未登录');
+            const { error } = await supabase
+                .from('user_data')
+                .upsert({ user_id: userId, key, value }, { onConflict: 'user_id, key' });
+            if (error) throw new Error(error.message);
+        }
+
+        async function apiSyncUpload(data) {
+            const userId = await getUserId();
+            if (!userId) throw new Error('未登录');
+            const entries = Object.entries(data).map(([key, value]) => ({ user_id: userId, key, value }));
+            const { error } = await supabase.from('user_data').upsert(entries, { onConflict: 'user_id, key' });
+            if (error) throw new Error(error.message);
+        }
+
+        async function apiSyncDownload() {
+            const userId = await getUserId();
+            if (!userId) throw new Error('未登录');
+            const { data, error } = await supabase
+                .from('user_data')
+                .select('key, value')
+                .eq('user_id', userId);
+            if (error) throw new Error(error.message);
+            const result = {};
+            (data || []).forEach(row => { result[row.key] = row.value; });
+            return result;
+        }
+
+        let authMode = 'login';
+
+        function showAuthModal() {
+            document.getElementById('auth-modal').classList.add('show');
+            document.getElementById('auth-error').style.display = 'none';
+            document.getElementById('auth-password').value = '';
+            const title = document.getElementById('auth-modal-title');
+            const btn = document.getElementById('auth-submit-btn');
+            const switchBtn = document.getElementById('auth-switch-btn');
+            if (authMode === 'login') {
+                title.textContent = '登录账号';
+                btn.textContent = '登录';
+                switchBtn.textContent = '没有账号？去注册';
+            } else {
+                title.textContent = '注册账号';
+                btn.textContent = '注册';
+                switchBtn.textContent = '已有账号？去登录';
+            }
+        }
+
+        function hideAuthModal() {
+            document.getElementById('auth-modal').classList.remove('show');
+        }
+
+        async function handleAuthSubmit() {
+            const email = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value.trim();
+            const errorEl = document.getElementById('auth-error');
+            const statusEl = document.getElementById('auth-status-text');
+            errorEl.style.display = 'none';
+            if (!email || !password) {
+                errorEl.textContent = '请填写邮箱和密码';
+                errorEl.style.display = 'block';
+                return;
+            }
+            if (password.length < 6) {
+                errorEl.textContent = '密码长度不能少于6位';
+                errorEl.style.display = 'block';
+                return;
+            }
+            statusEl.textContent = '正在处理...';
+            try {
+                if (authMode === 'login') {
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                } else {
+                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    if (error) throw error;
+                    if (data.user && data.user.identities && data.user.identities.length === 0) {
+                        errorEl.textContent = '该邮箱已注册，请直接登录';
+                        errorEl.style.display = 'block';
+                        statusEl.textContent = '';
+                        return;
+                    }
+                }
+                hideAuthModal();
+                statusEl.textContent = '';
+                if (window._onAuthSuccess) window._onAuthSuccess();
+            } catch (e) {
+                errorEl.textContent = e.message || '操作失败';
+                errorEl.style.display = 'block';
+                statusEl.textContent = '';
+            }
+        }
+
+        const ADMIN_USERNAME = "Genius";
+        const ADMIN_HASH = "6b5a179046247330fc41e50d04ab95ec0ca909ddc19e7af11e7b6b0a7186254a";
+        const INTERVALS_MS = [1*3600000, 24*3600000, 2*24*3600000, 6*24*3600000, 14*24*3600000, 30*24*3600000];
+        
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+
+        function formatLocalTime(date) {
+            const pad = n => n < 10 ? '0'+n : n;
+            return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }
+
+        function smartSplit(str) {
+            if (!str) return [];
+            let result = [];
+            let current = "";
+            let depth = 0;
+            for (let i = 0; i < str.length; i++) {
+                let char = str[i];
+                if ('([{（【<'.includes(char)) {
+                    depth++;
+                    current += char;
+                } else if (')]}）】>'.includes(char)) {
+                    depth = Math.max(0, depth - 1);
+                    current += char;
+                } else if ((char === ',' || char === '，' || char === ';' || char === '；') && depth === 0) {
+                    if (current.trim()) result.push(current.trim());
+                    current = "";
+                } else {
+                    current += char;
+                }
+            }
+            if (current.trim()) result.push(current.trim());
+            return result;
+        }
+
+        function splitBySlash(str) {
+            if (!str) return [];
+            let result = [];
+            let current = "";
+            let depth = 0;
+            for (let i = 0; i < str.length; i++) {
+                let char = str[i];
+                if ('([{（【<'.includes(char)) {
+                    depth++;
+                    current += char;
+                } else if (')]}）】>'.includes(char)) {
+                    depth = Math.max(0, depth - 1);
+                    current += char;
+                } else if (char === '/' && depth === 0) {
+                    if (current.trim()) result.push(current.trim());
+                    current = "";
+                } else {
+                    current += char;
+                }
+            }
+            if (current.trim()) result.push(current.trim());
+            return result;
+        }
+
+        function stripParentheses(str) {
+            if (!str) return "";
+            let prev;
+            do {
+                prev = str;
+                str = str.replace(/[({<\[（【][^)}>\]）】]*[)}>\]）】]/g, "");
+            } while (str !== prev);
+            return str.replace(/\s+/g, ' ').trim();
+        }
+
+        function cleanTextForCoreMatch(str) {
+            if (!str) return "";
+            return stripParentheses(str) 
+                      .replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "") 
+                      .toLowerCase();
+        }
+
+        function getSpellingHighlight(correct, input) {
+            if (!input) return `<span style="color:#ef4444;">(未输入)</span>`;
+            let result = "";
+            const cLower = correct.toLowerCase();
+            const iLower = input.toLowerCase();
+            for (let i = 0; i < input.length; i++) {
+                if (i < correct.length && cLower[i] === iLower[i]) {
+                    result += `<span class="char-correct">${input[i]}</span>`;
+                } else {
+                    result += `<span class="char-wrong">${input[i]}</span>`;
+                }
+            }
+            return result;
+        }
+
+        const wordApp = {
+            words: JSON.parse(localStorage.getItem("wordDictationData")) || [],
+            groups: JSON.parse(localStorage.getItem("wordDictationGroups")) || ["默认分组"],
+            groupReviewHistories: JSON.parse(localStorage.getItem("groupReviewHistories")) || {},
+            customNextReviews: JSON.parse(localStorage.getItem("wordCustomNextReviews")) || {},
+            
+            expandedProgressGroups: new Set(),
+            expandedReviewGroups: new Set(),
+            
+            currentGroup: "all",
+            currentDictationGroup: "all",
+            currentReviewGroup: "all",
+            currentProgressGroup: "all",
+
+            dictationMode: "spelling",
+            isDictationActive: false,
+            isReviewMode: false,
+            currentWordIndex: 0,
+            
+            initialDictationLength: 0,
+            retestQueue: new Set(),
+
+            correctCount: 0,
+            incorrectCount: 0,
+            currentWords: [],
+            skippedWords: [],
+            roundErrors: [],
+            hasLoadedData: localStorage.getItem("hasLoadedData") === "true",
+            isAdminLoggedIn: false,
+            
+            currentIsCorrect: false,
+            audioRate: 1.0, 
+
+            _authListenersAdded: false,
+
+            async init() {
+                if (!this._authListenersAdded) {
+                    this.addAuthEventListeners();
+                    this._authListenersAdded = true;
+                }
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    showAuthModal();
+                    window._onAuthSuccess = () => this.init();
+                    return;
+                }
+                try {
+                    await this.loadData();
+                } catch (e) {
+                    console.error('加载数据失败:', e);
+                    showAuthModal();
+                    window._onAuthSuccess = () => this.init();
+                    return;
+                }
+                this.setupEventListeners();
+                this.syncMissingMeaningGroups(); 
+                this.renderGroupSelects();
+                this.renderWordList();
+                this.renderReviewSchedule();
+                this.renderWordProgress();
+                this.renderDashboard();
+                this.updateAdminUI();
+            },
+
+            async loadData() {
+                const data = await apiSyncDownload();
+                this.words = data.words || [];
+                this.groups = data.groups || ["默认分组"];
+                this.groupReviewHistories = data.groupReviewHistories || {};
+                this.customNextReviews = data.customNextReviews || {};
+
+                this.groups.forEach(g => { if (!this.groupReviewHistories[g]) this.groupReviewHistories[g] = []; });
+
+                this.words.forEach(w => {
+                    if (!w.lastUpdateTime) w.lastUpdateTime = w.firstMissTime || Date.now();
+                    if (typeof w.firstErrorType === 'undefined') w.firstErrorType = w.firstMissTime ? "历史记录错" : "无";
+                    if (typeof w.firstSpellingInput === 'undefined') w.firstSpellingInput = "";
+                    if (typeof w.firstMissedMeanings === 'undefined') w.firstMissedMeanings = [];
+                    if (typeof w.missedMeanings === 'undefined') w.missedMeanings = [];
+                    if (typeof w.note === 'undefined') w.note = "";
+                    
+                    if (w.missedMeanings && w.missedMeanings.length > 0) {
+                        w.missedMeanings = w.missedMeanings.filter(Boolean);
+                        w.missedMeanings = [...new Set(w.missedMeanings)];
+                    }
+                    if (w.firstMissedMeanings && w.firstMissedMeanings.length > 0) {
+                        w.firstMissedMeanings = w.firstMissedMeanings.filter(Boolean);
+                        w.firstMissedMeanings = [...new Set(w.firstMissedMeanings)];
+                    }
+                });
+                
+                await this.saveWords();
+                this.updateGroupSelect();
+                this.updateImportGroupSelect();
+            },
+
+            async saveAll() {
+                try {
+                    await apiSyncUpload({
+                        words: this.words,
+                        groups: this.groups,
+                        groupReviewHistories: this.groupReviewHistories,
+                        customNextReviews: this.customNextReviews
+                    });
+                } catch (e) {
+                    console.error('保存数据失败:', e);
+                }
+            },
+            async saveWords() { await this.saveAll(); },
+            async saveGroups() { await this.saveAll(); },
+            async saveGroupHistories() { await this.saveAll(); },
+            async saveCustomNextReviews() { await this.saveAll(); },
+
+            requireAdmin() {
+                if (!this.isAdminLoggedIn) {
+                    alert("此操作需要管理员权限！\n请先点击右上角「管理员登录」按钮登录。");
+                    this.showLoginModal();
+                    return false;
+                }
+                return true;
+            },
+
+            showLoginModal() {
+                const modal = document.getElementById("admin-login-modal");
+                modal.classList.add("show");
+                document.getElementById("admin-password").value = "";
+                document.getElementById("admin-password").focus();
+            },
+
+            updateAdminUI() {
+                const btn = document.getElementById("admin-btn");
+                if (this.isAdminLoggedIn) {
+                    btn.textContent = "✅ 已授权管理员";
+                    btn.style.backgroundColor = "var(--success-color)";
+                } else {
+                    btn.textContent = "👨‍💻 管理员登录";
+                    btn.style.backgroundColor = "var(--warning-color)";
+                }
+            },
+
+            expandAndScrollToErr(id, groupName) {
+                document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+                document.querySelector('.tab[data-tab="word-progress"]').classList.add("active");
+                document.getElementById("word-progress").classList.add("active");
+                
+                if (this.currentProgressGroup !== "all" && this.currentProgressGroup !== groupName && this.currentProgressGroup !== 'errors') {
+                    document.getElementById("progress-group-select").value = "all";
+                    this.currentProgressGroup = "all";
+                }
+                
+                if (!this.expandedProgressGroups.has(groupName)) {
+                    this.expandedProgressGroups.add(groupName);
+                }
+                
+                this.renderWordProgress();
+                
+                setTimeout(() => {
+                    const targetEl = document.getElementById(`err-card-${id}`);
+                    if (targetEl) {
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetEl.style.backgroundColor = '#fffbeb';
+                        setTimeout(() => { targetEl.style.backgroundColor = ''; }, 2000);
+                    }
+                }, 150);
+                
+                document.getElementById('err-book-dropdown').style.display='none';
+            },
+
+            setupEventListeners() {
+                document.getElementById("global-search-input").addEventListener("input", () => this.renderWordList());
+                document.getElementById("local-search-input").addEventListener("input", () => this.renderWordList());
+
+                document.getElementById("err-book-search").addEventListener("input", (e) => {
+                    const query = e.target.value.toLowerCase().trim();
+                    const dropdown = document.getElementById("err-book-dropdown");
+                    if (!query) { dropdown.style.display = "none"; return; }
+                    
+                    const matches = this.words.filter(w => w.errorCount > 0 && (w.word.toLowerCase().includes(query) || w.meanings.join('').toLowerCase().includes(query)));
+                    if (matches.length > 0) {
+                        dropdown.innerHTML = matches.map(w => `<div class="search-drop-item" onclick="wordApp.expandAndScrollToErr('${w.id}', '${w.group}')"><strong style="color:var(--primary-color)">${w.word}</strong> <span class="group-tag" style="margin: 0 5px;">${w.group}</span> - ${w.meanings[0]}</div>`).join('');
+                        dropdown.style.display = "block";
+                    } else {
+                        dropdown.innerHTML = `<div class="search-drop-item" style="color:#94a3b8; text-align:center;">未找到包含此内容的错题</div>`;
+                        dropdown.style.display = "block";
+                    }
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#err-book-search') && !e.target.closest('#err-book-dropdown')) {
+                        const drp = document.getElementById('err-book-dropdown');
+                        if (drp) drp.style.display = 'none';
+                    }
+                    document.querySelectorAll('.ss-dropdown').forEach(d => {
+                        d.style.display = 'none';
+                    });
+                });
+
+                document.getElementById("word-list-group-select").addEventListener("change", (e) => {
+                    this.setCurrentGroup(e.target.value);
+                });
+                document.getElementById("dictation-group-select").addEventListener("change", (e) => {
+                    this.currentDictationGroup = e.target.value;
+                });
+                document.getElementById("review-group-select").addEventListener("change", (e) => {
+                    this.currentReviewGroup = e.target.value;
+                    this.renderReviewSchedule();
+                });
+                document.getElementById("progress-group-select").addEventListener("change", (e) => {
+                    this.currentProgressGroup = e.target.value;
+                    this.renderWordProgress();
+                });
+                document.getElementById("rename-group-btn").addEventListener("click", () => this.renameGroup());
+                document.getElementById("delete-group-btn").addEventListener("click", () => this.deleteCurrentGroup());
+
+                document.getElementById("add-word-btn").addEventListener("click", () => this.addWord());
+                document.getElementById("import-excel-btn").addEventListener("click", () => this.importExcel());
+                document.getElementById("export-data-btn").addEventListener("click", () => this.exportData());
+                document.getElementById("import-data-btn").addEventListener("click", () => this.importData());
+                document.getElementById("start-dictation-btn").addEventListener("click", () => this.startDictation(false));
+                document.getElementById("start-review-btn").addEventListener("click", () => this.startDictation(true));
+                document.getElementById("submit-answer-btn").addEventListener("click", () => this.submitAnswer());
+                
+                document.getElementById("forgot-meaning-btn").addEventListener("click", () => this.handleManualError("词义错误"));
+                document.getElementById("cant-hear-btn").addEventListener("click", () => this.handleManualError("发音不熟"));
+                document.getElementById("skip-word-btn").addEventListener("click", () => this.handleManualError("拼写和词义均错"));
+                document.getElementById("end-review-btn").addEventListener("click", () => this.endReviewAndReset());
+                
+                document.getElementById("quick-note-btn").addEventListener("click", () => {
+                    const word = this.currentWords[this.currentWordIndex];
+                    if (word) this.editNote(word.id);
+                });
+
+                document.getElementById("change-to-correct-btn").addEventListener("click", () => this.changeToCorrect());
+                document.getElementById("change-to-incorrect-btn").addEventListener("click", () => this.changeToIncorrect());
+                document.getElementById("return-dictation-btn").addEventListener("click", () => this.resetDictationUI());
+                document.getElementById("manual-edit-missed-btn").addEventListener("click", () => this.manualEditMissed());
+                document.getElementById("mark-no-missing-btn").addEventListener("click", () => this.markNoMissing());
+                document.getElementById("summary-retest-btn").addEventListener("click", () => {
+                    const errorWordsSet = new Set(this.roundErrors.map(e => e.word));
+                    this.currentWords = Array.from(errorWordsSet);
+                    if (this.currentWords.length > 0) {
+                        this.startDictationFromList();
+                    } else {
+                        alert("太棒了，本轮没有错词！");
+                        this.resetDictationUI();
+                    }
+                });
+                
+                document.getElementById("confirm-next-btn").addEventListener("click", () => {
+                    this.currentWordIndex++;
+                    document.getElementById("confirm-next-btn").style.display = "none";
+                    document.getElementById("quick-note-btn").style.display = "none";
+                    this.speakCurrentWord();
+                });
+                
+                document.getElementById("repeat-word-btn").addEventListener("click", () => {
+                    if (this.currentWords[this.currentWordIndex]) {
+                        this.speakWord(this.currentWords[this.currentWordIndex].word);
+                    }
+                });
+
+                document.getElementById("audio-speed-btn").addEventListener("click", () => {
+                    const rates = [0.5, 0.75, 1.0, 1.25];
+                    let idx = rates.indexOf(this.audioRate);
+                    idx = (idx + 1) % rates.length;
+                    this.audioRate = rates[idx];
+                    document.getElementById("audio-speed-btn").textContent = `倍速: ${this.audioRate}x`;
+                    if (this.isDictationActive && document.getElementById("active-dictation-panel").style.display !== "none") {
+                        if (this.currentWords[this.currentWordIndex]) {
+                            this.speakWord(this.currentWords[this.currentWordIndex].word);
+                        }
+                    }
+                });
+                document.querySelectorAll(".mode-btn").forEach(btn => {
+                    btn.addEventListener("click", e => {
+                        document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+                        e.target.classList.add("active");
+                        this.dictationMode = e.target.dataset.mode;
+                    });
+                });
+                document.querySelectorAll(".tab").forEach(tab => {
+                    tab.addEventListener("click", e => {
+                        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+                        e.target.classList.add("active");
+                        document.getElementById(e.target.dataset.tab).classList.add("active");
+                    });
+                });
+                document.getElementById("dashboard-header").addEventListener("click", () => {
+                    const content = document.getElementById("dashboard-content");
+                    const icon = document.getElementById("dashboard-toggle-icon");
+                    if (content.style.display === "none") {
+                        content.style.display = "block";
+                        icon.textContent = "▲";
+                    } else {
+                        content.style.display = "none";
+                        icon.textContent = "▼";
+                    }
+                });
+                document.addEventListener("keydown", e => {
+                    if (e.key === "Enter") {
+                        if (this.isDictationActive) {
+                            e.preventDefault(); 
+                            if (document.getElementById("confirm-next-btn").style.display !== "none") {
+                                document.getElementById("confirm-next-btn").click();
+                            } else if (document.getElementById("submit-answer-btn").style.display !== "none") {
+                                document.getElementById("submit-answer-btn").click();
+                            }
+                        } else if (document.getElementById("return-dictation-btn").style.display !== "none") {
+                            e.preventDefault();
+                            document.getElementById("return-dictation-btn").click();
+                        }
+                    }
+                });
+                document.getElementById("admin-btn").addEventListener("click", () => {
+                    if (this.isAdminLoggedIn) {
+                        if (confirm("确定退出管理员登录吗？")) {
+                            this.isAdminLoggedIn = false;
+                            this.updateAdminUI();
+                            document.getElementById("admin-password").value = "";
+                        }
+                    } else {
+                        this.showLoginModal();
+                    }
+                });
+                document.getElementById("login-btn").addEventListener("click", async () => {
+                    const username = document.getElementById("admin-username").value.trim();
+                    const password = document.getElementById("admin-password").value;
+                    if (username !== ADMIN_USERNAME) return alert("用户名错误！");
+                    try {
+                        const inputHash = await hashPassword(password);
+                        if (inputHash === ADMIN_HASH) {
+                            this.isAdminLoggedIn = true;
+                            this.updateAdminUI();
+                            document.getElementById("admin-login-modal").classList.remove("show");
+                            alert("身份验证成功！");
+                        } else {
+                            alert("密码错误！");
+                            document.getElementById("admin-password").focus();
+                        }
+                    } catch (e) { alert("验证失败，请刷新重试"); }
+                });
+                
+                document.getElementById("cancel-login-btn").addEventListener("click", () => document.getElementById("admin-login-modal").classList.remove("show"));
+                document.getElementById("admin-password").addEventListener("keydown", e => {
+                    if (e.key === "Enter") document.getElementById("login-btn").click();
+                });
+                document.getElementById("save-edit-word-btn").addEventListener("click", () => {
+                    const id = Number(document.getElementById("edit-word-id").value);
+                    const originalWord = this.words.find(w => w.id === id);
+                    if (originalWord) {
+                        const oldSpelling = originalWord.word.toLowerCase();
+                        const newSpelling = document.getElementById("edit-word-en").value.trim();
+                        const meanStr = document.getElementById("edit-word-zh").value.trim();
+                        
+                        const newMeanings = smartSplit(meanStr);
+                        
+                        this.words.forEach(w => {
+                            if (w.word.toLowerCase() === oldSpelling) {
+                                w.word = newSpelling;
+                                w.meanings = [...newMeanings];
+                            }
+                        });
+
+                        this.syncMissingMeaningGroups();
+                        this.saveWords();
+                        this.renderWordList();
+                        this.renderWordProgress();
+                        this.renderDashboard();
+                        document.getElementById("edit-word-modal").classList.remove("show");
+                        alert("修改成功，已全局同步！");
+                    }
+                });
+                document.getElementById("cancel-edit-word-btn").addEventListener("click", () => document.getElementById("edit-word-modal").classList.remove("show"));
+                
+                window.addEventListener("beforeunload", () => {
+                    const { data: { session } } = supabase.auth.getSession();
+                    if (!session) return;
+                    const data = JSON.stringify({
+                        words: this.words,
+                        groups: this.groups,
+                        groupReviewHistories: this.groupReviewHistories,
+                        customNextReviews: this.customNextReviews
+                    });
+                    navigator.sendBeacon(
+                        SUPABASE_URL + '/rest/v1/user_data',
+                        new Blob([JSON.stringify(
+                            Object.entries({
+                                words: this.words,
+                                groups: this.groups,
+                                groupReviewHistories: this.groupReviewHistories,
+                                customNextReviews: this.customNextReviews
+                            }).map(([key, value]) => ({ user_id: session.user.id, key, value }))
+                        )], { type: 'application/json' })
+                    );
+                });
+            },
+            
+            upgradeToSearchableSelect(selectId) {
+                const selectEl = document.getElementById(selectId);
+                if (!selectEl) return;
+                
+                let wrapper = selectEl.nextElementSibling;
+                if (wrapper && wrapper.classList.contains('searchable-select-wrapper')) {
+                    wrapper.remove();
+                }
+                
+                selectEl.style.display = 'none';
+                
+                wrapper = document.createElement('div');
+                wrapper.className = 'searchable-select-wrapper';
+                
+                let selectedText = selectEl.options[selectEl.selectedIndex]?.text || "请选择...";
+                
+                wrapper.innerHTML = `
+                    <div class="ss-display">
+                        <span class="ss-text" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${selectedText}</span>
+                        <span style="font-size:0.8rem; margin-left:8px; color:#94a3b8;">▼</span>
+                    </div>
+                    <div class="ss-dropdown">
+                        <div class="ss-search">
+                            <input type="text" placeholder="🔍 输入文字过滤查找..." onclick="event.stopPropagation()">
+                        </div>
+                        <div class="ss-options"></div>
+                    </div>
+                `;
+                
+                const display = wrapper.querySelector('.ss-display');
+                const dropdown = wrapper.querySelector('.ss-dropdown');
+                const searchInput = wrapper.querySelector('.ss-search input');
+                const optionsContainer = wrapper.querySelector('.ss-options');
+                
+                const renderOptions = (filter = "") => {
+                    optionsContainer.innerHTML = "";
+                    let currentOptgroup = null;
+                    
+                    Array.from(selectEl.options).forEach((opt) => {
+                        if (opt.text.toLowerCase().includes(filter.toLowerCase())) {
+                            
+                            if (opt.parentElement.tagName === 'OPTGROUP' && opt.parentElement.label !== currentOptgroup) {
+                                currentOptgroup = opt.parentElement.label;
+                                const groupLabel = document.createElement('div');
+                                groupLabel.className = 'ss-optgroup-label';
+                                groupLabel.textContent = currentOptgroup;
+                                optionsContainer.appendChild(groupLabel);
+                            }
+
+                            const optDiv = document.createElement('div');
+                            optDiv.className = 'ss-option' + (selectEl.value === opt.value ? ' selected' : '');
+                            optDiv.textContent = opt.text;
+                            
+                            if (opt.parentElement.tagName === 'OPTGROUP') {
+                                optDiv.style.paddingLeft = '24px';
+                            }
+                            
+                            optDiv.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                selectEl.value = opt.value;
+                                selectEl.dispatchEvent(new Event('change'));
+                                display.querySelector('.ss-text').textContent = opt.text;
+                                dropdown.style.display = 'none';
+                            });
+                            optionsContainer.appendChild(optDiv);
+                        }
+                    });
+                    
+                    if (optionsContainer.innerHTML === "") {
+                        optionsContainer.innerHTML = '<div style="padding:10px; text-align:center; color:#94a3b8; font-size:0.85rem;">未找到相关选项</div>';
+                    }
+                };
+                
+                renderOptions();
+                
+                display.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isVisible = dropdown.style.display === 'flex';
+                    document.querySelectorAll('.ss-dropdown').forEach(d => d.style.display = 'none');
+                    if (!isVisible) {
+                        dropdown.style.display = 'flex';
+                        searchInput.value = '';
+                        renderOptions();
+                        searchInput.focus();
+                    }
+                });
+                
+                searchInput.addEventListener('input', (e) => renderOptions(e.target.value));
+                selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
+            },
+
+            addAuthEventListeners() {
+                document.getElementById('auth-submit-btn').addEventListener('click', handleAuthSubmit);
+                document.getElementById('auth-switch-btn').addEventListener('click', () => {
+                    authMode = authMode === 'login' ? 'register' : 'login';
+                    showAuthModal();
+                });
+                document.getElementById('auth-password').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') handleAuthSubmit();
+                });
+                document.getElementById('auth-username').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') document.getElementById('auth-password').focus();
+                });
+            },
+
+            syncMissingMeaningGroups() {
+                const missingGroupsCreated = new Set();
+                const baseWords = this.words.filter(w => !w.group.endsWith("遗漏词义") && !w.group.endsWith("错误单词"));
+                
+                baseWords.forEach(w => {
+                    const hasMissing = w.missedMeanings && w.missedMeanings.length > 0;
+                    const isStatusMissing = w.lastErrorType === "词义不全";
+                    
+                    if (hasMissing || isStatusMissing) {
+                        const targetGroupName = `${w.group}遗漏词义`;
+                        if (!this.groups.includes(targetGroupName)) {
+                            this.groups.push(targetGroupName);
+                            this.groupReviewHistories[targetGroupName] = [];
+                            missingGroupsCreated.add(targetGroupName);
+                        }
+
+                        let existing = this.words.find(clone => clone.group === targetGroupName && clone.word.toLowerCase() === w.word.toLowerCase());
+                        if (!existing) {
+                            const cloned = JSON.parse(JSON.stringify(w));
+                            cloned.id = Date.now() + Math.floor(Math.random() * 100000);
+                            cloned.group = targetGroupName;
+                            this.words.push(cloned);
+                        } else {
+                            existing.missedMeanings = [...w.missedMeanings];
+                            existing.lastErrorType = w.lastErrorType;
+                            existing.meanings = [...w.meanings];
+                        }
+                    }
+                });
+                for (let i = this.words.length - 1; i >= 0; i--) {
+                    const clone = this.words[i];
+                    if (clone.group.endsWith("遗漏词义")) {
+                        const baseGroupName = clone.group.replace("遗漏词义", "");
+                        const baseWord = this.words.find(w => w.group === baseGroupName && w.word.toLowerCase() === clone.word.toLowerCase());
+                        if (!baseWord || (!baseWord.missedMeanings.length && baseWord.lastErrorType !== "词义不全")) {
+                            this.words.splice(i, 1);
+                        } else {
+                            clone.missedMeanings = [...baseWord.missedMeanings];
+                            clone.lastErrorType = baseWord.lastErrorType;
+                        }
+                    }
+                }
+
+                if (missingGroupsCreated.size > 0) {
+                    this.saveGroups();
+                    this.saveGroupHistories();
+                    this.updateGroupSelect();
+                    this.updateImportGroupSelect();
+                }
+                this.saveWords();
+                this.renderGroupSelects();
+            },
+
+            editWordFull(id) {
+                if (!this.requireAdmin()) return;
+                const word = this.words.find(w => w.id === id);
+                if (!word) return;
+                document.getElementById("edit-word-id").value = word.id;
+                document.getElementById("edit-word-en").value = word.word;
+                document.getElementById("edit-word-zh").value = word.meanings.join("，");
+                document.getElementById("edit-word-modal").classList.add("show");
+            },
+
+            editNote(id) {
+                const targetWord = this.words.find(w => w.id === id);
+                if(!targetWord) return;
+
+                let baseGroup = targetWord.group;
+                if (baseGroup.endsWith("错误单词")) baseGroup = baseGroup.replace("错误单词", "");
+                else if (baseGroup.endsWith("遗漏词义")) baseGroup = baseGroup.replace("遗漏词义", "");
+
+                const relatedWords = this.words.filter(w =>
+                    w.word.toLowerCase() === targetWord.word.toLowerCase() &&
+                    (w.group === baseGroup || w.group === baseGroup + "错误单词" || w.group === baseGroup + "遗漏词义")
+                );
+
+                const allNotes = relatedWords.map(w => w.note).filter(n => n && n.trim() !== "");
+                const mergedNote = [...new Set(allNotes)].join(" | ");
+
+                const input = prompt(`📝 编辑【${targetWord.word}】的随记便签\n(原组、错误组和遗漏组的记录已自动融合同步)：`, mergedNote);
+                if(input !== null) {
+                    const finalNote = input.trim();
+                    relatedWords.forEach(w => w.note = finalNote);
+                    this.saveWords();
+                    this.renderWordProgress();
+                    
+                    const noteDisplay = document.getElementById('dictation-note-display');
+                    if (noteDisplay && this.isDictationActive) {
+                        const currentW = this.currentWords[this.currentWordIndex];
+                        if (currentW && currentW.word.toLowerCase() === targetWord.word.toLowerCase()) {
+                            noteDisplay.innerHTML = finalNote || '<span style="color:#9ca3af;">暂无便签，可点击下方按钮添加...</span>';
+                        }
+                    }
+                }
+            },
+
+            clearFirstRecord(id) {
+                if (!this.requireAdmin()) return;
+                const targetWord = this.words.find(w => w.id === id);
+                if (!targetWord) return;
+
+                let baseGroup = targetWord.group;
+                if (baseGroup.endsWith("错误单词")) baseGroup = baseGroup.replace("错误单词", "");
+                else if (baseGroup.endsWith("遗漏词义")) baseGroup = baseGroup.replace("遗漏词义", "");
+
+                const relatedWords = this.words.filter(w =>
+                    w.word.toLowerCase() === targetWord.word.toLowerCase() &&
+                    (w.group === baseGroup || w.group === baseGroup + "错误单词" || w.group === baseGroup + "遗漏词义")
+                );
+
+                relatedWords.forEach(w => {
+                    w.firstMissTime = null;
+                    w.firstErrorType = "无"; 
+                    w.firstSpellingInput = ""; 
+                    w.firstMissedMeanings = []; 
+                });
+
+                this.saveWords(); 
+                this.renderWordProgress();
+            },
+
+            editSpellingRecord(id, isFirst) {
+                if (!this.requireAdmin()) return;
+                const targetWord = this.words.find(w => w.id === id);
+                if (!targetWord) return;
+                const current = isFirst ? targetWord.firstSpellingInput : targetWord.lastSpellingInput;
+                const input = prompt("修改错拼记录：", current || "");
+                if (input !== null) {
+                    const val = input.trim();
+                    
+                    let baseGroup = targetWord.group;
+                    if (baseGroup.endsWith("错误单词")) baseGroup = baseGroup.replace("错误单词", "");
+                    else if (baseGroup.endsWith("遗漏词义")) baseGroup = baseGroup.replace("遗漏词义", "");
+
+                    const relatedWords = this.words.filter(w =>
+                        w.word.toLowerCase() === targetWord.word.toLowerCase() &&
+                        (w.group === baseGroup || w.group === baseGroup + "错误单词" || w.group === baseGroup + "遗漏词义")
+                    );
+
+                    relatedWords.forEach(w => {
+                        if (isFirst) w.firstSpellingInput = val;
+                        else w.lastSpellingInput = val;
+                    });
+                    
+                    this.saveWords(); 
+                    this.renderWordProgress();
+                }
+            },
+
+            editMeaningRecord(id, isFirst) {
+                if (!this.requireAdmin()) return;
+                const targetWord = this.words.find(w => w.id === id);
+                if (!targetWord) return;
+                const current = isFirst ? targetWord.firstMissedMeanings.join("，") : targetWord.missedMeanings.join("，");
+                const input = prompt("修改漏义记录（用逗号分隔，清空则无遗漏）：", current || "");
+                if (input !== null) {
+                    const arr = smartSplit(input).filter(Boolean);
+                    
+                    let baseGroup = targetWord.group;
+                    if (baseGroup.endsWith("错误单词")) baseGroup = baseGroup.replace("错误单词", "");
+                    else if (baseGroup.endsWith("遗漏词义")) baseGroup = baseGroup.replace("遗漏词义", "");
+
+                    const relatedWords = this.words.filter(w =>
+                        w.word.toLowerCase() === targetWord.word.toLowerCase() &&
+                        (w.group === baseGroup || w.group === baseGroup + "错误单词" || w.group === baseGroup + "遗漏词义")
+                    );
+
+                    relatedWords.forEach(w => {
+                        if (isFirst) w.firstMissedMeanings = [...arr];
+                        else {
+                            w.missedMeanings = [...arr];
+                            if (arr.length === 0 && w.lastErrorType === "词义不全") {
+                                w.lastErrorType = "无";
+                                w.errorCount = Math.max(0, w.errorCount - 1);
+                            }
+                        }
+                    });
+                    
+                    this.syncMissingMeaningGroups();
+                    this.saveWords(); 
+                    this.renderWordProgress();
+                }
+            },
+
+            markFullyRemembered(id) {
+                if (!this.requireAdmin()) return;
+                const targetWord = this.words.find(w => w.id === id);
+                if (!targetWord) return;
+
+                let baseGroup = targetWord.group;
+                if (baseGroup.endsWith("错误单词")) baseGroup = baseGroup.replace("错误单词", "");
+                else if (baseGroup.endsWith("遗漏词义")) baseGroup = baseGroup.replace("遗漏词义", "");
+
+                const relatedWords = this.words.filter(w =>
+                    w.word.toLowerCase() === targetWord.word.toLowerCase() &&
+                    (w.group === baseGroup || w.group === baseGroup + "错误单词" || w.group === baseGroup + "遗漏词义")
+                );
+
+                relatedWords.forEach(w => {
+                    w.lastErrorType = "无";
+                    w.errorCount = 0;
+                    w.firstMissTime = null;
+                    w.firstErrorType = "无";
+                    w.firstSpellingInput = "";
+                    w.firstMissedMeanings = [];
+                    w.lastSpellingInput = "";
+                    w.missedMeanings = [];
+                    w.hasErrored = false;
+                });
+                
+                this.syncMissingMeaningGroups();
+                this.saveWords();
+                this.renderWordProgress();
+                this.renderDashboard();
+                this.renderWordList();
+                alert("已成功记牢，错误状态已清空！");
+            },
+
+            renderDashboard() {
+                // 新增：过滤掉自动生成的错题本和遗漏词义分组，只统计基础词库单词
+                const baseWords = this.words.filter(w => !w.group.endsWith("遗漏词义") && !w.group.endsWith("错误单词"));
+                
+                const memorizedCount = baseWords.filter(w => w.lastErrorType === "无" || !w.lastErrorType).length;
+                document.getElementById("total-memorized").textContent = memorizedCount;
+                document.getElementById("total-reviewed").textContent = baseWords.length; // 仅统计基础单词总数
+
+                const now = Date.now();
+                let html = "";
+                this.groups.forEach(g => {
+                    const history = this.groupReviewHistories[g] || [];
+                    if (history.length === 0) {
+                        html += `<div class="schedule-item"><span style="color:#475569;">📁 <b>${g}</b>: 未有听写记录</span></div>`;
+                    } else {
+                        const lastTime = history[history.length - 1];
+                        const reviewCount = history.length;
+                        let intervalIndex = Math.min(reviewCount - 1, INTERVALS_MS.length - 1);
+                        let nextTime = lastTime + INTERVALS_MS[intervalIndex];
+                        let isCustom = false;
+                        if (this.customNextReviews[g]) {
+                            nextTime = this.customNextReviews[g];
+                            isCustom = true;
+                        }
+
+                        const diffMs = nextTime - now;
+                        let statusHtml = "";
+                        if (diffMs <= 0) {
+                            const overdueDays = Math.floor(Math.abs(diffMs) / (1000*3600*24));
+                            statusHtml = `<span style="color:var(--error-color);font-weight:bold;">已超期 ${overdueDays} 天 (立即复习)</span>`;
+                        } else {
+                            const diffHours = diffMs / 3600000;
+                            if (diffHours < 24) statusHtml = `<span style="color:var(--warning-color);font-weight:bold;">约 ${Math.ceil(diffHours)} 小时后</span>`;
+                            else statusHtml = `<span style="color:var(--primary-color);font-weight:bold;">${Math.ceil(diffHours / 24)} 天后</span>`;
+                        }
+                        
+                        let customBadge = isCustom ? `<span style="font-size:0.7rem; background:#e0e7ff; color:#4338ca; padding:1px 4px; border-radius:4px; margin-left:4px;">自定</span>` : "";
+                        html += `<div class="schedule-item">
+                                    <span>📁 <b>${g}</b> <small style="color:#94a3b8;">(练${reviewCount}次)</small></span>
+                                    <span>下次: ${statusHtml} ${customBadge}</span>
+                                </div>`;
+                    }
+                });
+                document.getElementById("group-schedule-summary").innerHTML = html;
+            },
+
+            addWord() {
+                if (!this.requireAdmin()) return;
+                const wordInput = document.getElementById("word-input");
+                const meaningInput = document.getElementById("meaning-input");
+                const groupSelect = document.getElementById("group-select");
+                const newGroupInput = document.getElementById("new-group-input");
+                const word = wordInput.value.trim();
+                const meaningStr = meaningInput.value.trim();
+                let group = groupSelect.value;
+                if (!word || !meaningStr) return alert("请填写单词和词义");
+                if (newGroupInput.value.trim()) {
+                    group = newGroupInput.value.trim();
+                    if (!this.groups.includes(group)) {
+                        this.groups.push(group);
+                        this.groupReviewHistories[group] = [];
+                        this.saveGroups(); this.saveGroupHistories();
+                        this.updateGroupSelect(); this.updateImportGroupSelect();
+                        this.renderGroupSelects();
+                    }
+                }
+                const meanings = smartSplit(meaningStr);
+                const newWord = {
+                    id: Date.now(), word, meanings, group, reviewHistory: [],
+                    currentInterval: 0, nextReview: Date.now() + 3600000, lastReviewed: null,
+                    errorCount: 0, marks: [], missedMeanings: [], lastErrorType: "无", 
+                    lastSpellingInput: "", firstMissTime: null, firstErrorType: "无", firstSpellingInput: "", firstMissedMeanings: [],
+                    note: "", lastUpdateTime: Date.now(), hasErrored: false
+                };
+                this.words.push(newWord);
+                this.saveWords(); this.renderWordList(); this.renderWordProgress(); this.renderReviewSchedule(); this.renderDashboard();
+                wordInput.value = ""; meaningInput.value = ""; newGroupInput.value = "";
+                alert("添加成功！");
+            },
+
+            async importExcel() {
+                if (!this.requireAdmin()) return;
+                const fileInput = document.getElementById("excel-file");
+                const rangeInput = document.getElementById("import-range").value.trim();
+                let group = document.getElementById("import-group").value;
+                const newGroupInput = document.getElementById("import-new-group-input").value.trim();
+                if (!fileInput.files.length) return alert("请选择Excel文件");
+                if (newGroupInput) {
+                    group = newGroupInput;
+                    if (!this.groups.includes(group)) {
+                        this.groups.push(group);
+                        this.groupReviewHistories[group] = [];
+                        await this.saveGroups(); await this.saveGroupHistories();
+                        this.updateGroupSelect(); this.updateImportGroupSelect();
+                        this.renderGroupSelects();
+                    }
+                }
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = async e => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    let start = 1, end = rows.length - 1;
+                    if (rangeInput) {
+                        const [s, e] = rangeInput.split("-").map(Number);
+                        start = s || 1; end = e || rows.length - 1;
+                    }
+                    for (let i = start; i <= end; i++) {
+                        if (rows[i]) {
+                            const wordText = rows[i][1]?.toString().trim();
+                            const meaningStr = rows[i][2]?.toString().trim();
+                            if (wordText && meaningStr) {
+                                const meanings = smartSplit(meaningStr);
+                                const newWord = {
+                                    id: Date.now() + i, word: wordText, meanings, group, reviewHistory: [],
+                                    currentInterval: 0, nextReview: Date.now() + 3600000, lastReviewed: null,
+                                    errorCount: 0, marks: [], missedMeanings: [], lastErrorType: "无",
+                                    lastSpellingInput: "", firstMissTime: null, firstErrorType: "无", firstSpellingInput: "", firstMissedMeanings: [],
+                                    note: "", lastUpdateTime: Date.now(), hasErrored: false
+                                };
+                                this.words.push(newWord);
+                            }
+                        }
+                    }
+                    await this.saveWords();
+                    this.renderWordList(); this.renderWordProgress(); this.renderReviewSchedule(); this.renderDashboard();
+                    document.getElementById("import-new-group-input").value = "";
+                    alert("批量导入成功！");
+                };
+                reader.readAsArrayBuffer(file);
+            },
+
+            async exportData() {
+                const data = { words: this.words, groups: this.groups, groupReviewHistories: this.groupReviewHistories, customNextReviews: this.customNextReviews };
+                const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `word_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.click(); URL.revokeObjectURL(url);
+            },
+
+            async importData() {
+                if (!this.requireAdmin()) return;
+                const fileInput = document.getElementById("import-data-file");
+                if (!fileInput.files.length) return alert("请选择JSON文件");
+                const reader = new FileReader();
+                reader.onload = async e => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        this.words = data.words || [];
+                        this.groups = data.groups || ["默认分组"];
+                        this.groupReviewHistories = data.groupReviewHistories || {};
+                        this.customNextReviews = data.customNextReviews || {};
+                        this.words.forEach(w => {
+                            if (!w.lastUpdateTime) w.lastUpdateTime = w.firstMissTime || Date.now();
+                            if (typeof w.firstErrorType === 'undefined') w.firstErrorType = w.firstMissTime ? "历史记录错" : "无";
+                            if (typeof w.firstSpellingInput === 'undefined') w.firstSpellingInput = "";
+                            if (typeof w.firstMissedMeanings === 'undefined') w.firstMissedMeanings = [];
+                            if (typeof w.missedMeanings === 'undefined') w.missedMeanings = [];
+                            if (typeof w.note === 'undefined') w.note = "";
+                            if (w.missedMeanings && w.missedMeanings.length > 0) {
+                                w.missedMeanings = w.missedMeanings.filter(Boolean);
+                                w.missedMeanings = [...new Set(w.missedMeanings)];
+                            }
+                            if (w.firstMissedMeanings && w.firstMissedMeanings.length > 0) {
+                                w.firstMissedMeanings = w.firstMissedMeanings.filter(Boolean);
+                                w.firstMissedMeanings = [...new Set(w.firstMissedMeanings)];
+                            }
+                        });
+                        await this.saveAll();
+                        this.syncMissingMeaningGroups();
+                        this.renderGroupSelects();
+                        this.renderWordList();
+                        this.renderReviewSchedule(); this.renderWordProgress(); this.renderDashboard();
+                        alert("数据恢复成功！");
+                    } catch {
+                        alert("导入失败：文件格式不正确");
+                    }
+                };
+                reader.readAsText(fileInput.files[0]);
+            },
+
+            deleteWord(id) {
+                if (!this.requireAdmin()) return;
+                this.words = this.words.filter(w => w.id !== id);
+                this.syncMissingMeaningGroups();
+                this.saveWords(); this.renderWordList(); this.renderWordProgress(); this.renderDashboard();
+            },
+
+            renameInternalGroup(oldName, newName) {
+                const idx = this.groups.indexOf(oldName);
+                if (idx !== -1) this.groups[idx] = newName;
+                
+                if (this.groupReviewHistories[oldName]) {
+                    this.groupReviewHistories[newName] = this.groupReviewHistories[oldName];
+                    delete this.groupReviewHistories[oldName];
+                }
+                if (this.customNextReviews[oldName]) {
+                    this.customNextReviews[newName] = this.customNextReviews[oldName];
+                    delete this.customNextReviews[oldName];
+                }
+                this.words.forEach(w => {
+                    if (w.group === oldName) w.group = newName;
+                });
+            },
+
+            renameGroup() {
+                if (!this.requireAdmin()) return;
+                const oldName = this.currentGroup;
+                if (['all', 'errors', 'due'].includes(oldName)) return alert("系统内置全局视图无法重命名！");
+                
+                const newName = prompt(`将分组【${oldName}】重命名为：`, oldName);
+                if (!newName || newName.trim() === "" || newName === oldName) return;
+                const trimmedName = newName.trim();
+                
+                if (this.groups.includes(trimmedName)) return alert("该分组名已存在，请换一个名称！");
+                this.renameInternalGroup(oldName, trimmedName);
+                const relatedErrorGroup = `${oldName}错误单词`;
+                if (this.groups.includes(relatedErrorGroup)) {
+                    this.renameInternalGroup(relatedErrorGroup, `${trimmedName}错误单词`);
+                }
+                const relatedMissingGroup = `${oldName}遗漏词义`;
+                if (this.groups.includes(relatedMissingGroup)) {
+                    this.renameInternalGroup(relatedMissingGroup, `${trimmedName}遗漏词义`);
+                }
+
+                this.currentGroup = trimmedName;
+                if (this.currentDictationGroup === oldName) this.currentDictationGroup = trimmedName;
+                if (this.currentReviewGroup === oldName) this.currentReviewGroup = trimmedName;
+                if (this.currentProgressGroup === oldName) this.currentProgressGroup = trimmedName;
+
+                this.saveGroups(); this.saveGroupHistories(); this.saveCustomNextReviews(); this.saveWords();
+                this.renderGroupSelects(); this.renderWordList(); this.renderWordProgress(); this.renderReviewSchedule(); this.renderDashboard();
+                this.updateGroupSelect(); this.updateImportGroupSelect();
+            },
+
+            deleteCurrentGroup() {
+                if (!this.requireAdmin()) return;
+                const group = this.currentGroup;
+                if (['all', 'errors', 'due'].includes(group)) return alert("系统内置全局视图无法删除！");
+                if (!confirm(`确定要彻底删除分组【${group}】及其包含的全部单词吗？\n警告：此操作不可恢复！`)) return;
+                const groupsToDelete = [group, `${group}错误单词`, `${group}遗漏词义`];
+                groupsToDelete.forEach(g => {
+                    this.words = this.words.filter(w => w.group !== g);
+                    this.groups = this.groups.filter(grp => grp !== g);
+                    delete this.groupReviewHistories[g];
+                    delete this.customNextReviews[g];
+                });
+                
+                this.saveWords(); this.saveGroups(); this.saveGroupHistories(); this.saveCustomNextReviews();
+                this.currentGroup = "all";
+                if (this.currentDictationGroup === group) this.currentDictationGroup = "all";
+                if (this.currentReviewGroup === group) this.currentReviewGroup = "all";
+                if (this.currentProgressGroup === group) this.currentProgressGroup = "all";
+
+                this.renderGroupSelects();
+                this.renderWordList(); this.renderReviewSchedule(); this.renderWordProgress(); this.renderDashboard();
+                this.updateGroupSelect(); this.updateImportGroupSelect();
+            },
+
+            deleteReviewRecord(group, index) {
+                if (!this.requireAdmin()) return;
+                if (confirm(`确定删除「${group}」该次记录吗？`)) {
+                    this.groupReviewHistories[group].splice(index, 1);
+                    this.saveGroupHistories(); this.renderReviewSchedule(); this.renderDashboard();
+                }
+            },
+        
+            editReviewRecord(group, index) {
+                if (!this.requireAdmin()) return;
+                const ts = this.groupReviewHistories[group][index];
+                const d = new Date(ts);
+                const currentStr = formatLocalTime(d);
+                const newStr = prompt(`修改历史打卡时间 (格式: YYYY-MM-DD HH:MM:SS)`, currentStr);
+                if (newStr) {
+                    const parsed = Date.parse(newStr.replace(/-/g, '/'));
+                    if (!isNaN(parsed)) {
+                        this.groupReviewHistories[group][index] = parsed;
+                        this.groupReviewHistories[group].sort((a,b)=>a-b);
+                        this.saveGroupHistories(); this.renderReviewSchedule(); this.renderDashboard();
+                    } else alert("格式错误！");
+                }
+            },
+
+            addReviewRecord(group) {
+                if (!this.requireAdmin()) return;
+                const input = prompt(`新增【${group}】的复习打卡记录\n格式: YYYY-MM-DD HH:MM:SS\n(留空并确认，将默认记录为此时此刻)`, "");
+                if (input === null) return; 
+                
+                let timestamp = Date.now();
+                if (input.trim() !== "") {
+                    timestamp = Date.parse(input.replace(/-/g, '/'));
+                    if (isNaN(timestamp)) {
+                        return alert("时间格式错误！请严格使用 YYYY-MM-DD HH:MM:SS");
+                    }
+                }
+                
+                if (!this.groupReviewHistories[group]) {
+                    this.groupReviewHistories[group] = [];
+                }
+                this.groupReviewHistories[group].push(timestamp);
+                this.groupReviewHistories[group].sort((a, b) => a - b);
+                this.saveGroupHistories();
+                this.renderReviewSchedule();
+                this.renderDashboard();
+            },
+
+            editNextReview(group) {
+                if (!this.requireAdmin()) return;
+                const history = this.groupReviewHistories[group] || [];
+                if (history.length === 0) return alert("该组暂无打卡记录，请先【➕打卡】新增记录。");
+                
+                const now = Date.now();
+                const lastTime = history[history.length - 1];
+                let intervalIndex = Math.min(history.length - 1, INTERVALS_MS.length - 1);
+                const defaultNext = lastTime + INTERVALS_MS[intervalIndex];
+                
+                const currentNext = this.customNextReviews[group] || defaultNext;
+                const d = new Date(currentNext);
+                const currentStr = formatLocalTime(d);
+                
+                const newStr = prompt(`修改【${group}】的下次复习时间\n格式: YYYY-MM-DD HH:MM:SS\n(清空内容并确认，即可恢复系统默认计划)`, currentStr);
+                if (newStr !== null) {
+                    if (newStr.trim() === "") {
+                        delete this.customNextReviews[group];
+                        this.saveCustomNextReviews();
+                        this.renderReviewSchedule();
+                        this.renderDashboard();
+                        alert("已恢复默认艾宾浩斯复习计划！");
+                    } else {
+                        const timestamp = Date.parse(newStr.replace(/-/g, '/'));
+                        if (!isNaN(timestamp)) {
+                            this.customNextReviews[group] = timestamp;
+                            this.saveCustomNextReviews();
+                            this.renderReviewSchedule();
+                            this.renderDashboard();
+                            alert("下次复习时间修改成功！");
+                        } else {
+                            alert("时间格式错误！请严格使用 YYYY-MM-DD HH:MM:SS 格式。");
+                        }
+                    }
+                }
+            },
+
+            updateGroupSelect() {
+                const select = document.getElementById("group-select");
+                select.innerHTML = "";
+                this.groups.forEach(g => { select.innerHTML += `<option value="${g}">${g}</option>`; });
+                this.upgradeToSearchableSelect("group-select");
+            },
+
+            updateImportGroupSelect() {
+                const select = document.getElementById("import-group");
+                select.innerHTML = "";
+                this.groups.forEach(g => { select.innerHTML += `<option value="${g}">${g}</option>`; });
+                this.upgradeToSearchableSelect("import-group");
+            },
+
+            renderWordList() {
+                const list = document.getElementById("word-list");
+                const currentScroll = list.scrollTop;
+                list.innerHTML = "";
+                const now = Date.now();
+                
+                const gQuery = document.getElementById("global-search-input").value.trim().toLowerCase();
+                const lQuery = document.getElementById("local-search-input").value.trim().toLowerCase();
+                let filtered = this.words;
+
+                if (gQuery) {
+                    document.getElementById("local-search-wrapper").style.display = "none";
+                    filtered = this.words.filter(w => 
+                        w.word.toLowerCase().includes(gQuery) || 
+                        w.group.toLowerCase().includes(gQuery) || 
+                        w.meanings.some(m => m.toLowerCase().includes(gQuery))
+                    );
+                } else {
+                    document.getElementById("local-search-wrapper").style.display = "block";
+                    if (this.currentGroup === "all") {
+                        document.getElementById("local-search-wrapper").style.display = "none";
+                        filtered = this.words;
+                    } else {
+                        if (this.currentGroup === "errors") filtered = this.words.filter(w => w.errorCount > 0);
+                        else if (this.currentGroup === "due") filtered = this.words.filter(w => w.nextReview <= now);
+                        else filtered = this.words.filter(w => w.group === this.currentGroup);
+                        if (lQuery) {
+                            filtered = filtered.filter(w => 
+                                w.word.toLowerCase().includes(lQuery) || 
+                                w.meanings.some(m => m.toLowerCase().includes(lQuery))
+                            );
+                        }
+                    }
+                }
+
+                filtered.forEach(word => {
+                    const item = document.createElement("div");
+                    item.className = "word-item";
+                    const groupBadge = gQuery ? `<span class="group-tag">${word.group}</span>` : "";
+                    item.innerHTML = `
+                        <div class="word-info">
+                            <strong style="color:var(--primary-color); font-size:1.1rem;">${word.word}</strong>
+                            <button onclick="wordApp.speakWord('${word.word.replace(/'/g, "\\'")}')" class="btn-audio" title="朗读发音">🔊</button>
+                            ${groupBadge} 
+                            <span style="color:#64748b; margin-left:8px;">${word.meanings.join(" / ")}</span>
+                            <span style="color:var(--error-color); font-size:0.8rem; margin-left:8px; font-weight:bold;">(错:${word.errorCount})</span>
+                        </div>
+                        <div class="word-actions">
+                            <button class="success btn-tiny" onclick="wordApp.editWordFull(${word.id})">修改</button>
+                            <button class="error btn-tiny" onclick="wordApp.deleteWord(${word.id})">删除</button>
+                        </div>`;
+                    list.appendChild(item);
+                });
+                if (filtered.length === 0) list.innerHTML = "<div style='color:#94a3b8;text-align:center;margin-top:40px;'>没找到匹配的单词哦 🍃</div>";
+                setTimeout(() => { list.scrollTop = currentScroll; }, 10);
+            },
+
+            renderGroupSelects() {
+                const wordListSelect = document.getElementById("word-list-group-select");
+                const dictationSelect = document.getElementById("dictation-group-select");
+                const reviewSelect = document.getElementById("review-group-select");
+                const progressSelect = document.getElementById("progress-group-select");
+                const optionsHtml = `
+                    <option value="all">🌐 全部词库视图</option>
+                    <option value="errors">⚠️ 易错本集锦 (提取所有含错)</option>
+                    <option value="due">⏰ 艾宾浩斯到期视图</option>
+                    <optgroup label="你的专属单词分组">
+                    ${this.groups.map(g => `<option value="${g}">📁 ${g}</option>`).join('')}
+                    </optgroup>
+                `;
+                if(wordListSelect) {
+                    wordListSelect.innerHTML = optionsHtml;
+                    wordListSelect.value = this.currentGroup;
+                    this.upgradeToSearchableSelect("word-list-group-select");
+                }
+                if(dictationSelect) {
+                    dictationSelect.innerHTML = optionsHtml;
+                    dictationSelect.value = this.currentDictationGroup;
+                    this.upgradeToSearchableSelect("dictation-group-select");
+                }
+                if(reviewSelect) {
+                    reviewSelect.innerHTML = optionsHtml;
+                    reviewSelect.value = this.currentReviewGroup;
+                    this.upgradeToSearchableSelect("review-group-select");
+                }
+                if(progressSelect) {
+                    progressSelect.innerHTML = optionsHtml;
+                    progressSelect.value = this.currentProgressGroup;
+                    this.upgradeToSearchableSelect("progress-group-select");
+                }
+
+                const renameBtn = document.getElementById("rename-group-btn");
+                const deleteBtn = document.getElementById("delete-group-btn");
+                const isSystemGroup = ['all', 'errors', 'due'].includes(this.currentGroup);
+                
+                if (renameBtn) renameBtn.style.display = isSystemGroup ? 'none' : 'inline-flex';
+                if (deleteBtn) deleteBtn.style.display = isSystemGroup ? 'none' : 'inline-flex';
+            },
+
+            setCurrentGroup(group) {
+                this.currentGroup = group;
+                document.getElementById("local-search-input").value = "";
+                this.renderGroupSelects();
+                this.renderWordList();
+            },
+
+            speakWord(word) {
+                if ("speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                    const u = new SpeechSynthesisUtterance(word);
+                    u.lang = "en-US"; 
+                    u.rate = this.audioRate || 1.0; 
+                    speechSynthesis.speak(u);
+                } else alert("浏览器不支持语音合成");
+            },
+
+            startDictation(isReview) {
+                const group = this.currentDictationGroup || "all";
+                if (group === "errors") this.currentWords = this.words.filter(w => w.errorCount > 0);
+                else if (group === "due") this.currentWords = this.words.filter(w => w.nextReview <= Date.now());
+                else if (group === "all") this.currentWords = [...this.words];
+                else this.currentWords = this.words.filter(w => w.group === group);
+
+                if (!this.currentWords.length) return alert("当前范围没有需要听写的单词啦！");
+                this.startDictationFromList(isReview);
+            },
+
+            startDictationFromList(isReview = false) {
+                this.currentWords = this.currentWords.sort(() => Math.random() - 0.5);
+                this.isDictationActive = true; this.isReviewMode = isReview;
+                this.currentWordIndex = 0; this.correctCount = 0; this.incorrectCount = 0;
+                
+                this.initialDictationLength = this.currentWords.length;
+                this.retestQueue = new Set();
+                
+                this.skippedWords = []; this.roundErrors = [];
+                ["start-dictation-btn", "start-review-btn", "return-dictation-btn", "change-to-correct-btn", "change-to-incorrect-btn", "confirm-next-btn", "manual-edit-missed-btn", "mark-no-missing-btn", "quick-note-btn"].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = "none";
+                });
+                ["submit-answer-btn", "skip-word-btn", "forgot-meaning-btn", "cant-hear-btn", "end-review-btn", "repeat-word-btn", "audio-speed-btn"].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = "inline-block";
+                });
+                document.getElementById("active-dictation-panel").style.display = "block";
+                document.getElementById("summary-panel").style.display = "none";
+                document.getElementById("mode-selector-div").style.display = "flex";
+                document.getElementById("spelling-input-group").style.display = "block";
+                document.getElementById("meaning-input-group").style.display = this.dictationMode === "spelling" ? "block" : "none";
+                document.getElementById("current-word-display").textContent = "准备就绪...";
+                
+                const fb = document.getElementById("feedback");
+                fb.className = "feedback"; fb.style.display = "none";
+
+                if (isReview) document.getElementById("word-list-panel").classList.add("hidden");
+
+                this.updateStats(false);
+                setTimeout(() => this.speakCurrentWord(), 800);
+            },
+
+            speakCurrentWord() {
+                if (this.currentWordIndex >= this.currentWords.length) {
+                    if (this.skippedWords.length) {
+                        this.currentWords = this.skippedWords;
+                        this.skippedWords = [];
+                        this.currentWordIndex = 0;
+                        return this.speakCurrentWord();
+                    }
+                    return this.endDictation();
+                }
+                const word = this.currentWords[this.currentWordIndex];
+                document.getElementById("current-word-display").textContent = "🔊 听写中...";
+                this.speakWord(word.word);
+                
+                const spInput = document.getElementById("spelling-input");
+                const mnInput = document.getElementById("dictation-meaning-input");
+                spInput.value = ""; mnInput.value = "";
+                spInput.disabled = false; mnInput.disabled = false;
+                
+                document.getElementById("feedback").style.display = "none";
+                
+                ["submit-answer-btn", "skip-word-btn", "forgot-meaning-btn", "cant-hear-btn"].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.style.display = "inline-block";
+                });
+                ["confirm-next-btn", "change-to-correct-btn", "change-to-incorrect-btn", "manual-edit-missed-btn", "mark-no-missing-btn", "quick-note-btn"].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.style.display = "none";
+                });
+                spInput.focus();
+                this.updateProgress();
+                this.updateStats(false);
+            },
+
+            recordRoundError(word, spellingInput, meaningInput, type) {
+                if (!this.roundErrors.find(e => e.word.id === word.id)) {
+                    this.roundErrors.push({ word, userSpelling: spellingInput || "(未输入)", userMeaning: meaningInput || "(未输入)", type });
+                }
+                this.currentWords.splice(this.currentWordIndex + 1 + 6, 0, word);
+            },
+
+            submitAnswer() {
+                if (!this.isDictationActive) return;
+                document.getElementById("spelling-input").disabled = true;
+                document.getElementById("dictation-meaning-input").disabled = true;
+
+                const word = this.currentWords[this.currentWordIndex];
+                const isRetest = this.retestQueue.has(word.id);
+
+                const spellingInput = document.getElementById("spelling-input").value.trim();
+                const meaningInput = document.getElementById("dictation-meaning-input").value.trim();
+                
+                let spellingOk = (spellingInput.toLowerCase() === word.word.toLowerCase());
+                let meaningOk = true;
+                let meaningIncomplete = false;
+                word.missedMeanings = [];
+
+                if (this.dictationMode === "spelling") {
+                    let parsedTargets = [];
+                    let currentPos = "";
+                    word.meanings.forEach(mStr => {
+                        smartSplit(mStr).forEach(p => {
+                            let match = p.match(/^([a-z]+[\.])?\s*(.*)$/i);
+                            let pos = currentPos;
+                            let text = p;
+                            if (match && match[1]) {
+                                pos = match[1].toLowerCase();
+                                if (pos === 'vt.' || pos === 'vi.') pos = 'v.';
+                                text = match[2];
+                                currentPos = pos;
+                            }
+                            let subMeanings = splitBySlash(text);
+                            subMeanings.forEach(sub => {
+                                let originalText = sub.trim();
+                                if (!originalText) return;
+                                let coreText = stripParentheses(originalText);
+                                parsedTargets.push({ 
+                                    pos: pos, 
+                                    clean: cleanTextForCoreMatch(coreText), 
+                                    display: (pos ? pos : '') + originalText 
+                                });
+                            });
+                        });
+                    });
+
+                    let parsedUser = [];
+                    let userPos = "";
+                    smartSplit(meaningInput).forEach(p => {
+                        let match = p.match(/^([a-z]+[\.])?\s*(.*)$/i);
+                        let pos = userPos;
+                        let text = p;
+                        if (match && match[1]) {
+                            pos = match[1].toLowerCase();
+                            if (pos === 'vt.' || pos === 'vi.') pos = 'v.';
+                            text = match[2];
+                            userPos = pos;
+                        }
+                        let coreText = stripParentheses(text).trim();
+                        parsedUser.push({ 
+                            original: p, 
+                            pos: pos, 
+                            clean: cleanTextForCoreMatch(coreText) 
+                        });
+                    });
+
+                    let matchedIndices = new Set();
+                    parsedUser.forEach(u => {
+                        for (let i = 0; i < parsedTargets.length; i++) {
+                            if (!matchedIndices.has(i)) {
+                                let t = parsedTargets[i];
+                                let textMatch = u.clean && t.clean && (t.clean.includes(u.clean) || u.clean.includes(t.clean));
+                                let posMatch = true;
+                                if (u.pos && t.pos) posMatch = (u.pos === t.pos);
+                                else if (u.pos && !t.pos) posMatch = false;
+                                
+                                if (textMatch && posMatch) {
+                                    matchedIndices.add(i);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                    let missedDisplays = [];
+                    parsedTargets.forEach((t, i) => {
+                        if (!matchedIndices.has(i)) {
+                            missedDisplays.push(t.display);
+                        }
+                    });
+
+                    let matchedCount = matchedIndices.size;
+                    
+                    if (parsedUser.length > 0 && matchedCount > 0) {
+                        meaningOk = true; 
+                        if (matchedCount < parsedTargets.length) {
+                            meaningIncomplete = true;
+                            word.missedMeanings = missedDisplays;
+                        }
+                    } else {
+                        meaningOk = false;
+                        word.missedMeanings = missedDisplays;
+                    }
+                }
+
+                const isCorrect = spellingOk && meaningOk;
+                this.currentIsCorrect = isCorrect;
+                
+                let errorType = "无";
+                if (!isCorrect) {
+                    if (!spellingOk && meaningOk) errorType = "拼写错误";
+                    else if (spellingOk && !meaningOk) errorType = "词义错误";
+                    else errorType = "拼写和词义均错";
+                } else if (meaningIncomplete) {
+                    errorType = "词义不全";
+                }
+
+                if (isCorrect && !meaningIncomplete) {
+                    if (!isRetest) word.lastErrorType = "无";
+                    word.missedMeanings = [];
+                    word.lastSpellingInput = ""; 
+                } else {
+                    if (!isRetest) {
+                        word.lastErrorType = errorType;
+                        word.lastSpellingInput = !spellingOk ? spellingInput : ""; 
+
+                        if (!isCorrect && !word.firstMissTime) {
+                            word.firstMissTime = Date.now();
+                            word.firstErrorType = errorType;
+                            word.firstSpellingInput = !spellingOk ? spellingInput : ""; 
+                            word.firstMissedMeanings = [...word.missedMeanings];
+                        }
+                    }
+                    if (!isCorrect) {
+                        if (!isRetest) {
+                            this.recordRoundError(word, spellingInput, meaningInput, errorType);
+                            this.retestQueue.add(word.id);
+                        } else {
+                            this.currentWords.splice(this.currentWordIndex + 1 + 6, 0, word);
+                        }
+                    }
+                }
+
+                if (!isRetest) {
+                    word.lastUpdateTime = Date.now();
+                    if (isCorrect) this.correctCount++; else { this.incorrectCount++; word.errorCount++; }
+                }
+
+                let statusText = "";
+                let bgClass = "";
+                
+                if (isCorrect && !meaningIncomplete) {
+                    statusText = isRetest ? '✨ 重听拼写完全正确！' : '✨ 完全正确！';
+                    bgClass = "feedback correct";
+                } else if (isCorrect && meaningIncomplete) {
+                    statusText = isRetest ? '👍 重听拼写正确 (但有词义遗漏)' : '👍 拼写正确 (但有词义遗漏)';
+                    bgClass = "feedback warning-pass";
+                } else {
+                    statusText = isRetest ? `❌ 依然${errorType}，请再记一下` : `❌ ${errorType}`;
+                    bgClass = "feedback incorrect";
+                }
+
+                let highlightedSpelling = getSpellingHighlight(word.word, spellingInput);
+                let missedHtml = "";
+                if (word.missedMeanings && word.missedMeanings.length > 0) {
+                    missedHtml = `<div style="margin-top:12px; padding:10px; background-color:#fffbeb; border-left:4px solid #f59e0b; border-radius:4px; font-size:0.95rem;">
+                                    <strong style="color:#b45309;">⚠️ 遗漏词义提醒：</strong>
+                                    <span style="color:#d97706; font-weight:bold;">${word.missedMeanings.join("，")}</span>
+                                  </div>`;
+                }
+
+                let noteHtml = `<div id="dictation-note-container" style="margin-top:15px; padding:12px; background:#fffde7; border-left:4px solid #fbc02d; border-radius:6px;">
+                                    <strong style="color:#f57f17;">📝 随记便签：</strong>
+                                    <div id="dictation-note-display" style="color:#555; margin-top:5px; font-size:0.95rem;">${word.note || '<span style="color:#9ca3af;">暂无便签，可点击下方按钮添加...</span>'}</div>
+                                </div>`;
+
+                const feedback = document.getElementById("feedback");
+                feedback.innerHTML = `
+                    <div id="feedback-status" style="font-weight:bold; font-size:1.2rem; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px; color: ${isCorrect && meaningIncomplete ? 'var(--warning-color)' : (isCorrect ? 'var(--success-color)' : 'var(--error-color)')}">
+                        ${statusText}
+                    </div>
+                    <div style="font-size:1.05rem; line-height:1.7;">
+                        <div style="margin-bottom:10px;">
+                            <div>你的拼写：<strong>${highlightedSpelling}</strong></div>
+                            ${this.dictationMode === 'spelling' ? `<div>你的词义：<strong>${meaningInput || '<span style="color:#94a3b8;">(未输入)</span>'}</strong></div>` : '<div style="color:#94a3b8;font-size:0.9rem;">(仅拼写模式，未考核词义)</div>'}
+                        </div>
+                        <div style="background:#f1f5f9; padding:10px; border-radius:6px;">
+                            <div style="color:var(--dark-color);">标准拼写：<strong style="font-size:1.15rem; color:var(--primary-color);">${word.word}</strong></div>
+                            <div style="color:var(--dark-color);">标准词义：<strong>${word.meanings.join(" / ")}</strong></div>
+                        </div>
+                        ${missedHtml}
+                    </div>
+                    ${noteHtml}
+                `;
+                feedback.className = bgClass; feedback.style.display = "block";
+                
+                this.syncMissingMeaningGroups();
+                this.saveWords(); this.renderWordList(); this.renderWordProgress();
+                this.updateStats(true); this.renderDashboard();
+                this.hideDictationButtons();
+            },
+
+            handleManualError(reasonType) {
+                if (!this.isDictationActive) return;
+                document.getElementById("spelling-input").disabled = true;
+                document.getElementById("dictation-meaning-input").disabled = true;
+
+                const word = this.currentWords[this.currentWordIndex];
+                const isRetest = this.retestQueue.has(word.id);
+                this.currentIsCorrect = false;
+                if (!isRetest) {
+                    word.lastErrorType = reasonType;
+                    let parsedTargets = [];
+                    let currentPos = "";
+                    word.meanings.forEach(mStr => {
+                        smartSplit(mStr).forEach(p => {
+                            let match = p.match(/^([a-z]+[\.])?\s*(.*)$/i);
+                            let pos = currentPos;
+                            let text = p;
+                            if (match && match[1]) {
+                                pos = match[1].toLowerCase();
+                                if (pos === 'vt.' || pos === 'vi.') pos = 'v.';
+                                text = match[2];
+                                currentPos = pos;
+                            }
+                            let subMeanings = splitBySlash(text);
+                            subMeanings.forEach(sub => {
+                                let originalText = sub.trim();
+                                if (!originalText) return;
+                                parsedTargets.push((pos ? pos : '') + originalText);
+                            });
+                        });
+                    });
+                    word.missedMeanings = parsedTargets;
+                    
+                    word.lastSpellingInput = ""; 
+                    word.lastUpdateTime = Date.now();
+                    if (!word.firstMissTime) {
+                        word.firstMissTime = Date.now();
+                        word.firstErrorType = reasonType;
+                        word.firstSpellingInput = "";
+                        word.firstMissedMeanings = [...word.missedMeanings];
+                    }
+
+                    this.incorrectCount++;
+                    word.errorCount++;
+                    this.recordRoundError(word, "", "", reasonType);
+                    this.retestQueue.add(word.id);
+                } else {
+                    this.currentWords.splice(this.currentWordIndex + 1 + 6, 0, word);
+                }
+                
+                this.syncMissingMeaningGroups();
+                this.saveWords();
+                this.renderWordList(); this.renderWordProgress();
+                this.updateStats(true); this.renderDashboard();
+
+                let noteHtml = `<div id="dictation-note-container" style="margin-top:15px; padding:12px; background:#fffde7; border-left:4px solid #fbc02d; border-radius:6px;">
+                                    <strong style="color:#f57f17;">📝 随记便签：</strong>
+                                    <div id="dictation-note-display" style="color:#555; margin-top:5px; font-size:0.95rem;">${word.note || '<span style="color:#9ca3af;">暂无便签，可点击下方按钮添加...</span>'}</div>
+                                </div>`;
+
+                const fb = document.getElementById("feedback");
+                fb.innerHTML = `
+                    <div id="feedback-status" style="font-weight:bold; font-size:1.2rem; margin-bottom:12px; color:var(--warning-color);">❌ 记录：${reasonType}</div>
+                    <div style="font-size:1.05rem; line-height:1.7; background:#f1f5f9; padding:10px; border-radius:6px;">
+                        <div>标准拼写：<strong style="color:var(--primary-color); font-size:1.15rem;">${word.word}</strong></div>
+                        <div>标准词义：<strong>${word.meanings.join(" / ")}</strong></div>
+                    </div>
+                    ${noteHtml}`;
+                fb.className = "feedback incorrect"; fb.style.display = "block";
+                this.hideDictationButtons();
+            },
+
+            hideDictationButtons() {
+                ["submit-answer-btn", "skip-word-btn", "forgot-meaning-btn", "cant-hear-btn"].forEach(id => {
+                    const el = document.getElementById(id); if(el) el.style.display = "none";
+                });
+                
+                ["confirm-next-btn", "change-to-correct-btn", "change-to-incorrect-btn", "quick-note-btn", "manual-edit-missed-btn"].forEach(id => {
+                    const el = document.getElementById(id); if(el) el.style.display = "inline-block";
+                });
+                
+                const word = this.currentWords[this.currentWordIndex];
+                if (word && word.missedMeanings && word.missedMeanings.length > 0) {
+                    const noBtn = document.getElementById("mark-no-missing-btn");
+                    if(noBtn) noBtn.style.display = "inline-block";
+                } else {
+                    const noBtn = document.getElementById("mark-no-missing-btn");
+                    if(noBtn) noBtn.style.display = "none";
+                }
+            },
+
+            markNoMissing() {
+                const word = this.currentWords[this.currentWordIndex];
+                word.missedMeanings = [];
+                let spellingOk = (document.getElementById("spelling-input").value.trim().toLowerCase() === word.word.toLowerCase());
+                
+                if (spellingOk || this.currentIsCorrect) {
+                    this.changeToCorrect();
+                    const sDiv = document.getElementById("feedback-status");
+                    if (sDiv) sDiv.innerHTML = `✨ 完全正确！ <span style="font-size:0.8rem; background:#dcfce7; color:#166534; padding:2px 6px; border-radius:4px;">人工标记无遗漏</span>`;
+                } else {
+                    word.lastErrorType = "拼写错误";
+                    let err = this.roundErrors.find(e => e.word.id === word.id);
+                    if (err) err.type = "拼写错误";
+                    
+                    word.lastUpdateTime = Date.now();
+                    this.syncMissingMeaningGroups();
+                    this.saveWords();
+                    this.renderWordProgress();
+                    const fb = document.getElementById("feedback");
+                    const sDiv = document.getElementById("feedback-status");
+                    if (sDiv) {
+                        sDiv.innerHTML = `❌ 拼写错误 <span style="font-size:0.8rem; background:#fee2e2; color:#b91c1c; padding:2px 6px; border-radius:4px;">词义已标为无遗漏</span>`;
+                        sDiv.style.color = "var(--error-color)";
+                        fb.className = "feedback incorrect";
+                    }
+                    const mDiv = fb.querySelector('div[style*="background-color:#fffbeb"]');
+                    if (mDiv) mDiv.remove();
+                }
+
+                document.getElementById("mark-no-missing-btn").style.display = "none";
+            },
+
+            manualEditMissed() {
+                const word = this.currentWords[this.currentWordIndex];
+                const current = word.missedMeanings.join("，");
+                const input = prompt("手动输入真正遗漏的词义（用逗号/分号分隔，清空则视为无遗漏）：", current || "");
+                if (input !== null) {
+                    const newMissed = smartSplit(input).filter(Boolean);
+                    if (newMissed.length === 0) {
+                        this.markNoMissing();
+                        return;
+                    }
+
+                    word.missedMeanings = newMissed;
+                    let spellingOk = (document.getElementById("spelling-input").value.trim().toLowerCase() === word.word.toLowerCase());
+                    
+                    if (this.currentIsCorrect) {
+                        word.lastErrorType = "词义不全";
+                    } else {
+                        word.lastErrorType = spellingOk ? "词义不全" : "拼写和词义均错";
+                    }
+                    word.lastUpdateTime = Date.now();
+                    
+                    this.syncMissingMeaningGroups();
+                    this.saveWords();
+                    this.renderWordProgress();
+                    
+                    const fb = document.getElementById("feedback");
+                    let mHtml = `<div style="margin-top:12px; padding:10px; background-color:#fffbeb; border-left:4px solid #f59e0b; border-radius:4px;"><strong style="color:#b45309;">⚠️ 遗漏部分（已修正）：</strong><span style="color:#d97706; font-weight:bold;">${word.missedMeanings.join("，")}</span></div>`;
+                    
+                    const sDiv = document.getElementById("feedback-status");
+                    if (sDiv) {
+                        if (this.currentIsCorrect) {
+                            sDiv.innerHTML = `👍 拼写正确 (但有词义遗漏)`;
+                            sDiv.style.color = 'var(--warning-color)';
+                            fb.className = 'feedback warning-pass';
+                        } else {
+                            sDiv.innerHTML = `❌ 存在错误 (伴随词义遗漏)`;
+                            sDiv.style.color = 'var(--error-color)';
+                            fb.className = 'feedback incorrect';
+                        }
+                    }
+                    
+                    const existingMissed = fb.querySelector('div[style*="background-color:#fffbeb"]');
+                    if (existingMissed) existingMissed.remove();
+                    
+                    const noteContainer = document.getElementById("dictation-note-container");
+                    if (noteContainer) {
+                        noteContainer.insertAdjacentHTML('beforebegin', mHtml);
+                    } else {
+                        fb.innerHTML += mHtml;
+                    }
+                }
+            },
+
+            endReviewAndReset() {
+                if (!confirm("确定结束并重置这些单词的复习周期？")) return;
+                this.currentWords.forEach(w => { w.currentInterval = 0; w.nextReview = Date.now() + 3600000; w.errorCount = 0; });
+                this.saveWords(); this.endDictation();
+            },
+
+            changeToCorrect() { 
+                if (!this.isDictationActive || this.currentIsCorrect) return;
+                this.currentIsCorrect = true; 
+                
+                const word = this.currentWords[this.currentWordIndex];
+                const isRetest = this.retestQueue.has(word.id);
+                
+                if (!isRetest) {
+                    this.correctCount++; this.incorrectCount--;
+                    word.errorCount = Math.max(0, word.errorCount - 1);
+                    if (word.errorCount === 0) {
+                        word.firstMissTime = null;
+                        word.firstErrorType = "无"; word.firstSpellingInput = ""; word.firstMissedMeanings = [];
+                    }
+                    this.roundErrors = this.roundErrors.filter(e => e.word.id !== word.id);
+                    this.retestQueue.delete(word.id);
+                }
+
+                word.lastErrorType = "无";
+                word.missedMeanings = []; word.lastSpellingInput = ""; word.lastUpdateTime = Date.now();
+                
+                for (let i = this.currentWords.length - 1; i > this.currentWordIndex; i--) {
+                    if (this.currentWords[i].id === word.id) this.currentWords.splice(i, 1);
+                }
+                
+                this.syncMissingMeaningGroups();
+                this.saveWords();
+                this.renderWordList(); this.renderWordProgress(); this.updateStats(true); this.renderDashboard();
+
+                const sDiv = document.getElementById("feedback-status");
+                sDiv.innerHTML = "✨ 完全正确！ (已强制改判)"; sDiv.style.color = "var(--success-color)";
+                document.getElementById("feedback").className = "feedback correct";
+                const mDiv = document.getElementById("feedback").querySelector('div[style*="background-color:#fffbeb"]');
+                if (mDiv) mDiv.remove();
+
+                document.getElementById("mark-no-missing-btn").style.display = "none";
+            },
+            
+            changeToIncorrect() { 
+                if (!this.isDictationActive || !this.currentIsCorrect) return;
+                this.currentIsCorrect = false; 
+                const word = this.currentWords[this.currentWordIndex];
+                const isRetest = this.retestQueue.has(word.id);
+                if (!isRetest) {
+                    this.correctCount--;
+                    this.incorrectCount++;
+                    word.errorCount++; 
+                    if (!word.firstMissTime) {
+                        word.firstMissTime = Date.now();
+                        word.firstErrorType = "人工改错";
+                        word.firstSpellingInput = ""; word.firstMissedMeanings = [];
+                    }
+                    this.recordRoundError(word, "人工改错", "", "人工改错");
+                    this.retestQueue.add(word.id);
+                } else {
+                    this.currentWords.splice(this.currentWordIndex + 1 + 6, 0, word);
+                }
+
+                word.lastErrorType = "人工改错";
+                word.missedMeanings = []; word.lastUpdateTime = Date.now();
+
+                this.syncMissingMeaningGroups();
+                this.saveWords(); this.renderWordList(); this.renderWordProgress(); this.updateStats(true); this.renderDashboard();
+
+                const sDiv = document.getElementById("feedback-status");
+                sDiv.innerHTML = "❌ 存在错误 (已强制改判)";
+                sDiv.style.color = "var(--error-color)";
+                document.getElementById("feedback").className = "feedback incorrect";
+            },
+
+            updateProgress() {
+                const effectiveIndex = Math.min(this.currentWordIndex, this.initialDictationLength);
+                const prog = this.initialDictationLength === 0 ? 0 : (effectiveIndex / this.initialDictationLength) * 100;
+                document.getElementById("progress-bar").style.width = prog + "%";
+                document.getElementById("progress-text").textContent = `${effectiveIndex}/${this.initialDictationLength}`;
+            },
+
+            updateStats(isSubmitted = false) {
+                document.getElementById("correct-count").textContent = this.correctCount;
+                document.getElementById("incorrect-count").textContent = this.incorrectCount;
+                
+                let passedInitial = Math.min(this.currentWordIndex + (isSubmitted ? 1 : 0), this.initialDictationLength);
+                let pendingDictation = this.initialDictationLength - passedInitial;
+                document.getElementById("pending-dictation-count").textContent = pendingDictation;
+                
+                let totalRemaining = this.currentWords.length - this.currentWordIndex - (isSubmitted ? 1 : 0);
+                let pendingRetest = totalRemaining - pendingDictation;
+                document.getElementById("pending-retest-count").textContent = Math.max(0, pendingRetest);
+            },
+
+            endDictation() {
+                this.isDictationActive = false;
+                document.getElementById("spelling-input-group").style.display = "none";
+                document.getElementById("meaning-input-group").style.display = "none";
+                ["submit-answer-btn","skip-word-btn","forgot-meaning-btn","cant-hear-btn","end-review-btn","change-to-correct-btn","change-to-incorrect-btn","confirm-next-btn","repeat-word-btn","manual-edit-missed-btn","mark-no-missing-btn", "audio-speed-btn", "quick-note-btn"].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.style.display = "none";
+                });
+                const group = this.currentDictationGroup;
+                if (group && this.groups.includes(group)) {
+                    if (!this.groupReviewHistories[group]) this.groupReviewHistories[group] = [];
+                    this.groupReviewHistories[group].push(Date.now());
+                    this.saveGroupHistories(); this.renderReviewSchedule(); this.renderDashboard();
+                }
+
+                if (this.roundErrors.length > 0 && group) {
+                    const errorGroupName = group === 'all' || group === 'errors' || group === 'due' ? '全部词库错误单词' : (group.endsWith("错误单词") ? group : `${group}错误单词`);
+                    if (!this.groups.includes(errorGroupName)) {
+                        this.groups.push(errorGroupName);
+                        this.groupReviewHistories[errorGroupName] = [];
+                        this.saveGroups(); this.saveGroupHistories();
+                        this.updateGroupSelect(); this.updateImportGroupSelect();
+                        this.renderGroupSelects();
+                    }
+
+                    this.roundErrors.forEach(err => {
+                        const wordToCopy = err.word;
+                        let existing = this.words.find(w => w.group === errorGroupName && w.word.toLowerCase() === wordToCopy.word.toLowerCase());
+                        if (!existing) {
+                            const cloned = JSON.parse(JSON.stringify(wordToCopy));
+                            cloned.id = Date.now() + Math.floor(Math.random() * 100000);
+                            cloned.group = errorGroupName;
+                            this.words.push(cloned);
+                        }
+                    });
+                    this.saveWords(); this.renderWordList(); this.renderWordProgress(); this.renderDashboard();
+                }
+
+                document.getElementById("active-dictation-panel").style.display = "none";
+                document.getElementById("mode-selector-div").style.display = "none";
+                document.getElementById("summary-panel").style.display = "block";
+
+                const titleEl = document.getElementById("summary-title");
+                const listEl = document.getElementById("summary-list");
+                if (this.roundErrors.length > 0) {
+                    titleEl.innerHTML = '📋 本轮需加强的单词';
+                    titleEl.style.color = 'var(--error-color)';
+                    let html = "";
+                    this.roundErrors.forEach((err, idx) => {
+                        html += `
+                            <div class="summary-item">
+                                <div style="font-size:1.1rem; font-weight:bold; color:var(--dark-color);">
+                                     ${idx+1}. <span style="color:var(--primary-color)">${err.word.word}</span> <span style="font-weight:normal; font-size:0.9rem; color:#64748b;">— ${err.word.meanings.join(' / ')}</span>
+                                </div>
+                                <div style="font-size:0.9rem; margin-top:6px; color:#64748b; background:#f8fafc; padding:8px; border-radius:4px;">
+                                    你的输入：<span style="color:var(--error-color); font-weight:bold;">${err.userSpelling}</span> | 
+                                    词义：<span style="color:var(--error-color); font-weight:bold;">${err.userMeaning}</span>
+                                    <span style="background:#fee2e2; color:#ef4444; padding:2px 6px; border-radius:12px; font-size:0.75rem; margin-left:8px;">${err.type}</span>
+                                </div>
+                            </div>`;
+                    });
+                    listEl.innerHTML = html;
+                    document.getElementById("summary-retest-btn").style.display = "inline-block";
+                } else {
+                    titleEl.innerHTML = '🎉 完美通关！'; titleEl.style.color = 'var(--success-color)';
+                    listEl.innerHTML = `<div style="text-align:center; padding:50px; font-size:1.5rem; color:var(--success-color);">本次听写完全通过<br>太棒啦！</div>`;
+                    document.getElementById("summary-retest-btn").style.display = "none";
+                }
+
+                document.getElementById("return-dictation-btn").style.display = "inline-block";
+                if (this.isReviewMode) document.getElementById("word-list-panel").classList.remove("hidden");
+                this.isReviewMode = false;
+            },
+
+            resetDictationUI() {
+                document.getElementById("current-word-display").textContent = "请选择分组开始";
+                document.getElementById("progress-bar").style.width = "0%";
+                document.getElementById("progress-text").textContent = "0/0";
+                document.getElementById("correct-count").textContent = "0";
+                document.getElementById("incorrect-count").textContent = "0";
+                document.getElementById("pending-dictation-count").textContent = "0";
+                document.getElementById("pending-retest-count").textContent = "0";
+                document.getElementById("spelling-input").value = "";
+                document.getElementById("dictation-meaning-input").value = "";
+                const fb = document.getElementById("feedback"); fb.className = "feedback"; fb.style.display = "none";
+
+                document.getElementById("summary-panel").style.display = "none";
+                document.getElementById("active-dictation-panel").style.display = "block";
+                document.getElementById("mode-selector-div").style.display = "flex";
+                document.getElementById("return-dictation-btn").style.display = "none";
+                document.getElementById("start-dictation-btn").style.display = "inline-block";
+                document.getElementById("start-review-btn").style.display = "inline-block";
+                const qnBtn = document.getElementById("quick-note-btn");
+                if(qnBtn) qnBtn.style.display = "none";
+            },
+
+            renderReviewSchedule() {
+                const list = document.getElementById("review-schedule-list");
+                const currentScroll = list.scrollTop;
+                list.innerHTML = "";
+                
+                const now = Date.now();
+                let groupsToRender = this.groups;
+                if (this.currentReviewGroup !== "all") {
+                    if (['errors', 'due'].includes(this.currentReviewGroup)) {
+                        groupsToRender = this.groups.filter(g => g === this.currentReviewGroup);
+                        if (groupsToRender.length === 0) groupsToRender = this.groups; 
+                    } else {
+                        groupsToRender = this.groups.filter(g => g === this.currentReviewGroup);
+                    }
+                }
+
+                groupsToRender.forEach(g => {
+                    const history = this.groupReviewHistories[g] || [];
+                    let historyHtml = history.length === 0 ? "<p style='color:#94a3b8; text-align:center; margin-bottom:10px;'>暂无听写记录</p>" : "<ul class='review-history'>";
+                    history.forEach((ts, idx) => {
+                        const d = new Date(ts);
+                        const dateStr = formatLocalTime(d);
+                        historyHtml += `
+                            <li>
+                                <span style="font-size:0.9rem;">${dateStr}</span>
+                                <span>
+                                    <button onclick="wordApp.deleteReviewRecord('${g}', ${idx});" class="error btn-tiny">删除</button>
+                                    <button onclick="wordApp.editReviewRecord('${g}', ${idx});" class="secondary btn-tiny">修改</button>
+                                </span>
+                            </li>`;
+                    });
+                    if (history.length > 0) {
+                        historyHtml += "</ul>";
+                        const lastTime = history[history.length - 1];
+                        const diffMsNow = now - lastTime;
+                        const diffDays = Math.floor(diffMsNow / (1000 * 60 * 60 * 24));
+                        let diffText = diffDays === 0 ? "今天" : (diffDays >= 30 ? `${Math.floor(diffDays / 30)}个月` : `${diffDays}天`);
+
+                        let intervalIndex = Math.min(history.length - 1, INTERVALS_MS.length - 1);
+                        const defaultNext = lastTime + INTERVALS_MS[intervalIndex];
+                        const nextTime = this.customNextReviews[g] || defaultNext;
+                        
+                        const diffNextMs = nextTime - now;
+                        let nextText = "";
+                        if (diffNextMs <= 0) {
+                            nextText = `<span style="color:var(--error-color);font-weight:bold;">已超期 (立即复习)</span>`;
+                        } else {
+                            const diffHours = diffNextMs / 3600000;
+                            if (diffHours < 24) nextText = `约 ${Math.ceil(diffHours)} 小时后`;
+                            else nextText = `${Math.ceil(diffHours / 24)} 天后`;
+                        }
+
+                        historyHtml += `
+                            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #e2e8f0; font-size:0.85rem; color:var(--primary-color); display:flex; flex-direction:column; gap:8px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>距上次：<b>${diffText}</b></span>
+                                    <button onclick="wordApp.addReviewRecord('${g}')" class="success btn-tiny" style="padding:2px 6px;">➕ 打卡</button>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>下次应在：<b>${nextText}</b></span>
+                                    <button onclick="wordApp.editNextReview('${g}')" class="warning btn-tiny" style="padding:2px 6px;">⏰ 改时间</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        historyHtml += `<div style="text-align:right; margin-top:8px;">
+                            <button onclick="wordApp.addReviewRecord('${g}')" class="success btn-tiny">➕ 新增首条记录</button>
+                        </div>`;
+                    }
+                    
+                    const div = document.createElement("div");
+                    div.className = "group-review";
+                    const isExpanded = this.expandedReviewGroups.has(g);
+                    const isActive = isExpanded;
+                    div.innerHTML = `
+                        <div class="group-header"><span>📁 ${g}</span><span class="toggle-icon">${isActive ? '▲' : '▼'}</span></div>
+                        <div class="group-content ${isActive ? 'active' : ''}">${historyHtml}</div>`;
+                    div.querySelector('.group-header').addEventListener('click', (e) => {
+                        const content = e.currentTarget.nextElementSibling; 
+                        const isNowActive = content.classList.toggle('active');
+                        e.currentTarget.querySelector('.toggle-icon').textContent = isNowActive ? '▲' : '▼';
+                        if (isNowActive) this.expandedReviewGroups.add(g);
+                        else this.expandedReviewGroups.delete(g);
+                    });
+                    list.appendChild(div);
+                });
+                
+                if (groupsToRender.length === 0) list.innerHTML = "<div style='color:#94a3b8; text-align:center; padding:30px;'>这里空空如也</div>";
+                setTimeout(() => { list.scrollTop = currentScroll; }, 10);
+            },
+
+            renderWordProgress() {
+                const container = document.getElementById("word-progress-list");
+                const currentScroll = container.scrollTop;
+                container.innerHTML = "";
+                
+                let filteredWords = this.words;
+                const now = Date.now();
+                if (this.currentProgressGroup !== "all") {
+                    if (this.currentProgressGroup === "errors") {
+                        filteredWords = this.words.filter(w => w.errorCount > 0);
+                    } else if (this.currentProgressGroup === "due") {
+                        filteredWords = this.words.filter(w => w.nextReview <= now);
+                    } else {
+                        filteredWords = this.words.filter(w => w.group === this.currentProgressGroup);
+                    }
+                }
+
+                const grouped = {};
+                filteredWords.forEach(w => { if (!grouped[w.group]) grouped[w.group] = []; grouped[w.group].push(w); });
+                const sortedGroupNames = Object.keys(grouped).sort((a, b) => {
+                    const indexA = this.groups.indexOf(a);
+                    const indexB = this.groups.indexOf(b);
+                    const posA = indexA === -1 ? 9999 : indexA;
+                    const posB = indexB === -1 ? 9999 : indexB;
+                    return posA - posB;
+                });
+                sortedGroupNames.forEach(groupName => {
+                    const groupDiv = document.createElement("div"); groupDiv.className = "group-review";
+                    
+                    const isExpanded = this.expandedProgressGroups.has(groupName);
+                    const isActive = isExpanded;
+                    groupDiv.innerHTML = `
+                        <div class="group-header"><span>单元：${groupName}（${grouped[groupName].length} 词）</span><span class="toggle-icon">${isActive ? '▲' : '▼'}</span></div>
+                        <div class="group-content ${isActive ? 'active' : ''}" style="padding:5px;"></div>`;
+                    
+                    const contentDiv = groupDiv.querySelector(".group-content");
+
+                    grouped[groupName].forEach(w => {
+                        const item = document.createElement("div");
+                        item.className = "word-progress-item";
+                        item.id = `err-card-${w.id}`;
+                        let firstText = w.firstMissTime ? `<span style="color:#ef4444">${w.firstErrorType}</span> (${new Date(w.firstMissTime).toLocaleDateString()})` : "<span style='color:#a1a1aa;'>未产生错误</span>";
+                        
+                        let hasFirstSpellErr = (w.firstErrorType && w.firstErrorType.includes("拼写")) || (w.firstSpellingInput && w.firstSpellingInput.toLowerCase() !== w.word.toLowerCase());
+                        let firstSpellingHtml = hasFirstSpellErr ? `<div class="spell-highlight">❌ 错拼：${getSpellingHighlight(w.word, w.firstSpellingInput)}</div>` : "";
+                        let firstMissedHtml = (w.firstMissedMeanings && w.firstMissedMeanings.length) ? `<div class="missed-highlight">⚠️ 漏义：${w.firstMissedMeanings.join("，")}</div>` : "";
+
+                        let latestText = w.lastErrorType === "无" ? "<span style='color:#10b981;'>已掌握</span>" : `<span style="color:#ef4444">${w.lastErrorType}</span> (${w.lastUpdateTime ? new Date(w.lastUpdateTime).toLocaleDateString() : '-'})`;
+                        
+                        let hasLastSpellErr = (w.lastErrorType && w.lastErrorType.includes("拼写")) || (w.lastSpellingInput && w.lastSpellingInput.toLowerCase() !== w.word.toLowerCase());
+                        let latestSpellingHtml = hasLastSpellErr ? `<div class="spell-highlight">❌ 错拼：${getSpellingHighlight(w.word, w.lastSpellingInput)}</div>` : "";
+                        let latestMissedHtml = (w.missedMeanings && w.missedMeanings.length) ? `<div class="missed-highlight">⚠️ 漏义：${w.missedMeanings.join("，")}</div>` : "";
+                        
+                        // 替换为全新的 Soft UI 按钮
+                        item.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <div style="font-size:1.05rem; display:flex; align-items:center;">
+                                    <strong>${w.word}</strong>
+                                    <button onclick="wordApp.speakWord('${w.word.replace(/'/g, "\\'")}')" class="btn-audio" title="朗读发音">🔊</button>
+                                    <span style="color:#64748b; font-size:0.9rem; margin-left:6px;">— ${w.meanings.join(" / ")}</span>
+                                 </div>
+                                <div>
+                                    ${w.errorCount > 0 ? `<span class="err-badge">错 ${w.errorCount} 次</span>` : `<span style="color:#10b981; font-size:0.8rem; font-weight:bold;">无错记录</span>`}
+                                    <button onclick="wordApp.deleteWord(${w.id})" class="error btn-tiny" style="margin-left:5px;">删除</button>
+                                </div>
+                            </div>
+                            
+                            <div class="state-card">
+                                <div class="state-col state-col-left">
+                                    <div class="state-title">首次薄弱点</div>
+                                    <div class="state-content">
+                                        <div>${firstText}</div>
+                                        ${firstSpellingHtml}
+                                        ${firstMissedHtml}
+                                     </div>
+                                    <div class="state-actions">
+                                        <button onclick="wordApp.editSpellingRecord(${w.id}, true)" class="btn-tiny btn-soft-blue">修拼写</button>
+                                        <button onclick="wordApp.editMeaningRecord(${w.id}, true)" class="btn-tiny btn-soft-orange">修遗漏</button>
+                                        <button onclick="wordApp.clearFirstRecord(${w.id})" class="btn-tiny btn-soft-red">清记录</button>
+                                     </div>
+                                </div>
+                                <div class="state-col">
+                                    <div class="state-title">当前状态</div>
+                                    <div class="state-content">
+                                        <div>${latestText}</div>
+                                        ${latestSpellingHtml}
+                                        ${latestMissedHtml}
+                                    </div>
+                                    <div class="state-actions">
+                                        <button onclick="wordApp.editSpellingRecord(${w.id}, false)" class="btn-tiny btn-soft-blue">修拼写</button>
+                                        <button onclick="wordApp.editMeaningRecord(${w.id}, false)" class="btn-tiny btn-soft-orange">修遗漏</button>
+                                        <button onclick="wordApp.markFullyRemembered(${w.id})" class="btn-tiny btn-soft-green">记牢</button>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="note-box">
+                                <div class="note-header">
+                                    <span>📝 错题便签</span>
+                                    <button class="btn-tiny btn-soft-purple" onclick="wordApp.editNote(${w.id})">编辑</button>
+                                </div>
+                                <div style="color:#555;">${w.note || "暂无记录，点击编辑添加专属记忆笔记..."}</div>
+                            </div>
+                        `;
+                        contentDiv.appendChild(item);
+                    });
+
+                    groupDiv.querySelector('.group-header').addEventListener('click', (e) => {
+                        const content = e.currentTarget.nextElementSibling; 
+                        const isNowActive = content.classList.toggle('active');
+                        e.currentTarget.querySelector('.toggle-icon').textContent = isNowActive ? '▲' : '▼';
+                        if (isNowActive) this.expandedProgressGroups.add(groupName);
+                        else this.expandedProgressGroups.delete(groupName);
+                    });
+                    container.appendChild(groupDiv);
+                });
+
+                if (Object.keys(grouped).length === 0) container.innerHTML = "<div style='color:#94a3b8; text-align:center; padding:30px;'>这里空空如也</div>";
+                
+                setTimeout(() => { container.scrollTop = currentScroll; }, 10);
+            },
+
+            autoSave() {
+                this.exportData();
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => wordApp.init());
+    </script>
+</body>
+</html>
